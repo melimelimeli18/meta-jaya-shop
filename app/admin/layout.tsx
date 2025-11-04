@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import DashboardRoot from '../components/admin/DashboardRoot';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -10,12 +12,11 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const pathname = usePathname();
 
   // COMMENT DULU AUTH CHECKING
-  /*
   useEffect(() => {
-    const router = useRouter();
     
     // Skip auth check for login page
     if (pathname === '/admin/login') {
@@ -30,7 +31,6 @@ export default function AdminLayout({
       router.push('/admin/login');
     }
   }, [pathname]);
-  */
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
