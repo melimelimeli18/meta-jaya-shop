@@ -1,0 +1,60 @@
+/* app/sections/user/catalog/SearchBar.module.css */
+
+.searchBarContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.searchInput {
+  padding-left: 2.5rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  border-radius: 50px !important;
+  border-color: #468386 !important;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #468386 !important;
+  box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25) !important;
+}
+
+.filterButton {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.filterButton:hover {
+  transform: scale(1.1);
+}
+
+.filterButton:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .searchBarContainer {
+    margin-bottom: 1rem;
+  }
+}

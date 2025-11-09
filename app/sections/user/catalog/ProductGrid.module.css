@@ -1,0 +1,284 @@
+/* Product Header */
+.productHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.productTitle {
+  font-weight: normal;
+  margin-bottom: 0.25rem;
+  font-size: 1.75rem;
+  color: #212529;
+}
+
+.productSubtitle {
+  color: #6c757d;
+  margin-bottom: 0;
+  font-size: 0.875rem;
+}
+
+/* Product Grid Layout */
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 0.5fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.productCardWrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 277px;
+  height: 407px;
+  background: white;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.productImageWrapper {
+  height: 180px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0.5rem;
+}
+
+.productBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  padding: 0 1rem 1.5rem;
+  text-align: left;
+}
+
+.productBadge {
+  display: inline-block;
+  background-color: #468386;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: normal;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.productCardTitle {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: #212529;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productPrice {
+  font-size: 16px;
+  color: #6c757d;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  opacity: 0.3;
+  margin-bottom: 1.5rem;
+}
+
+.emptyTitle {
+  color: #6c757d;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.emptyText {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+/* Tablet Responsive (768px - 991px) */
+@media (max-width: 991px) {
+  .productGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .productCard {
+    max-width: 240px;
+    height: 380px;
+  }
+
+  .productImageWrapper {
+    height: 160px;
+  }
+
+  .productCardTitle {
+    font-size: 18px;
+  }
+
+  .productPrice {
+    font-size: 15px;
+  }
+
+  .productTitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* Mobile Responsive (max-width: 768px) */
+@media (max-width: 768px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .productCard {
+    max-width: 100%;
+    height: 301px;
+  }
+
+  .productImageWrapper {
+    height: 120px;
+    padding: 0.75rem;
+  }
+
+  .productBody {
+    padding: 0 0.75rem 1rem;
+  }
+
+  .productBadge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .productCardTitle {
+    font-size: 14px;
+    margin-bottom: 1rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .productPrice {
+    font-size: 12px;
+    margin-bottom: 0.75rem;
+  }
+
+  .productTitle {
+    font-size: 1.25rem;
+  }
+
+  .productSubtitle {
+    font-size: 0.75rem;
+  }
+
+  .emptyState {
+    padding: 3rem 1rem;
+  }
+
+  .emptyIcon {
+    font-size: 3rem;
+  }
+
+  .emptyTitle {
+    font-size: 1rem;
+  }
+
+  .emptyText {
+    font-size: 0.875rem;
+  }
+}
+
+/* Extra Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .productGrid {
+    gap: 8px;
+  }
+
+  .productCard {
+    height: 280px;
+  }
+
+  .productImageWrapper {
+    height: 100px;
+    padding: 0.5rem;
+  }
+
+  .productBody {
+    padding: 0 0.5rem 0.75rem;
+  }
+
+  .productCardTitle {
+    font-size: 13px;
+    margin-bottom: 0.5rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .productPrice {
+    font-size: 11px;
+    margin-bottom: 0.5rem;
+  }
+
+  .productHeader {
+    margin-bottom: 1rem;
+  }
+
+  .productTitle {
+    font-size: 1.125rem;
+  }
+}
+
+/* Extra Small Screens (max-width: 360px) */
+@media (max-width: 360px) {
+  .productCard {
+    height: 260px;
+  }
+
+  .productImageWrapper {
+    height: 90px;
+  }
+
+  .productCardTitle {
+    font-size: 12px;
+  }
+
+  .productPrice {
+    font-size: 10px;
+  }
+
+  .productBadge {
+    font-size: 0.6rem;
+  }
+}

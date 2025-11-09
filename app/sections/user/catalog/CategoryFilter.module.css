@@ -1,0 +1,131 @@
+.desktopFilter {
+  position: sticky;
+  top: 20px;
+}
+
+.filterTitle {
+  margin-bottom: 1rem;
+  margin-top: 0;
+  font-weight: 600;
+  text-align: left;
+  font-size: 1.25rem;
+  color: #212529;
+}
+
+.filterForm {
+  text-align: left;
+}
+
+.filterItem {
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.filterItem:first-child {
+  margin-top: 0;
+}
+
+.filterItem:last-child {
+  margin-bottom: 0;
+}
+
+.filterLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.filterCount {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
+}
+
+.applyButtonWrapper {
+  margin-top: 2.5rem;
+}
+
+/* Custom checkbox/radio styling - Horizontal alignment */
+.filterItem input[type="checkbox"],
+.filterItem input[type="radio"] {
+  cursor: pointer;
+  margin-top: 0 !important;
+  flex-shrink: 0;
+}
+
+.filterItem label {
+  cursor: pointer;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0.5rem 0;
+  width: 100%;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.filterItem:hover label {
+  color: #468386;
+}
+
+/* Mobile Offcanvas styling */
+.mobileFilter .offcanvas-body {
+  padding: 1.5rem;
+}
+
+.mobileFilter .offcanvas-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Form Check customization - Perfect horizontal alignment */
+.filterForm :global(.form-check) {
+  padding-left: 1.75rem;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  display: flex;
+  align-items: center;
+  min-height: auto;
+}
+
+.filterForm :global(.form-check-input) {
+  margin-top: 0 !important;
+  margin-right: 0.5rem;
+  margin-left: -1.75rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.filterForm :global(.form-check-label) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  line-height: 1.5;
+}
+
+.filterForm :global(.form-check-input:checked) {
+  background-color: #468386;
+  border-color: #468386;
+}
+
+.filterForm :global(.form-check-input:focus) {
+  border-color: #468386;
+  box-shadow: 0 0 0 0.2rem rgba(70, 131, 134, 0.25);
+}
+
+@media (max-width: 768px) {
+  .filterTitle {
+    font-size: 1.125rem;
+  }
+}
