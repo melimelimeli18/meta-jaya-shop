@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
-import FeaturedProductForm from '@/app/sections/admin/edit-produk-unggulan/FeaturedProductForm';
-import FeaturedProductList from '@/app/sections/admin/edit-produk-unggulan/FeaturedProductList';
+import FeaturedProductForm from '@/src/app/sections/admin/edit-produk-unggulan/FeaturedProductForm';
+import FeaturedProductList from '@/src/app/sections/admin/edit-produk-unggulan/FeaturedProductList';
 
 interface Product {
   id: number;

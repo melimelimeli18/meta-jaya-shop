@@ -1,5 +1,5 @@
-import UserNavbar from '@/app/components/user/Navbar';
-import Footer from '@/app/components/user/Footer';
+import UserNavbar from '@/src/app/components/user/Navbar';
+import Footer from '@/src/app/components/user/Footer';
 
 export default function UserLayout({
   children,

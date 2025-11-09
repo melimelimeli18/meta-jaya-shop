@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import ImageUpload from '@/app/components/admin/ImageUploadModal';
+import ImageUpload from '@/src/app/components/admin/ImageUploadModal';
 
 interface HeroData {
   image: string | File;

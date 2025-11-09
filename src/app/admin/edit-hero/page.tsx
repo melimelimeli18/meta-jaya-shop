@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
-import HeroForm from '@/app/sections/admin/edit-hero/HeroForm';
-import HeroPreview from '@/app/sections/admin/edit-hero/HeroPreview';
+import HeroForm from '@/src/app/sections/admin/edit-hero/HeroForm';
+import HeroPreview from '@/src/app/sections/admin/edit-hero/HeroPreview';
 
 interface HeroData {
   image: string | File;

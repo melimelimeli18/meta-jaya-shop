@@ -1,54 +1,56 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-
-// Dummy data untuk login
-const DUMMY_ADMIN = {
-  email: 'admin@metajaya.com',
-  password: 'admin123'
-};
+import { useAuth } from '@/src/app/context/AuthContext';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auth checking - uncomment kalo udah mau dipake
-  /*
-  useEffect(() => {
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      // redirect ke dashboard kalo udah login
-      router.push('/admin/catalog');
-    }
-  }, [router]);
-  */
 
-  const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
     
-    // cek dummy data
-    if (email === DUMMY_ADMIN.email && password === DUMMY_ADMIN.password) {
-      // login berhasil
-      console.log('Login berhasil!');
-      
-      // simpen token
-      localStorage.setItem('admin_token', 'dummy-token-12345');
-      
-      // redirect ke catalog
-      router.push('/admin/catalog');
-    } else {
-      // login gagal
-      setError('Email atau password salah!');
-      console.log('Login gagal');
+    try {
+      // Login dengan Supabase Auth
+      await login(email, password);
+      // Redirect akan otomatis dari AuthContext
+    } catch (err) {
+      // Tampilkan error message
+      setError(err instanceof Error ? err.message : 'Email atau password salah!');
+      console.log('Login gagal:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  // Show loading saat checking auth
+  if (isLoading) {
+    return (
+      <div 
+        className="d-flex align-items-center justify-content-center"
+        style={{ 
+          minHeight: "100vh", 
+          backgroundColor: "#f8f9fa" 
+        }}
+      >
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -117,6 +119,7 @@ export default function AdminLoginPage() {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
                     style={{
                       borderRadius: "50px",
                       padding: "0.75rem 1rem 0.75rem 3rem",
@@ -145,6 +148,7 @@ export default function AdminLoginPage() {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
                     style={{
                       borderRadius: "50px",
                       padding: "0.75rem 3rem 0.75rem 3rem",
@@ -155,6 +159,7 @@ export default function AdminLoginPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="position-absolute btn btn-link"
+                    disabled={isSubmitting}
                     style={{ 
                       right: '10px', 
                       top: '50%', 
@@ -185,23 +190,29 @@ export default function AdminLoginPage() {
                     type="button"
                     className="btn"
                     onClick={handleLogin}
+                    disabled={isSubmitting}
                     style={{
                       backgroundColor: "#468386",
                       color: "white",
                       borderRadius: "50px",
                       padding: "0.75rem 3rem",
                       fontWeight: "600",
-                      border: "none"
+                      border: "none",
+                      opacity: isSubmitting ? 0.6 : 1
                     }}
                   >
-                    Login
+                    {isSubmitting ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Loading...
+                      </>
+                    ) : (
+                      'Login'
+                    )}
                   </button>
 
-                  {/* Info dummy credentials */}
+                  {/* Info credentials */}
                   <div className="mt-3 text-muted" style={{ fontSize: "12px" }}>
-                    <small>
-                      Demo: admin@metajaya.com / admin123
-                    </small>
                   </div>
                 </div>
               </div>

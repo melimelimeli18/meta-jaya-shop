@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
-import PrivacyEditor from '@/app/sections/admin/edit-privacy/PrivacyEditor';
+import PrivacyEditor from '@/src/app/sections/admin/edit-privacy/PrivacyEditor';
 
 // data dummy
 const INITIAL_PRIVACY_CONTENT = `1. Informasi yang Kami Kumpulkan

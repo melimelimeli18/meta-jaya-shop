@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
-import ProductModal from '@/app/components/admin/ProductModal';
-import DeleteModal from '@/app/components/admin/DeleteModal';
+import ProductModal from '@/src/app/components/admin/ProductModal';
+import DeleteModal from '@/src/app/components/admin/DeleteModal';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/src/app/context/AuthContext';
 
 interface Product {
   id: number;
@@ -94,13 +96,26 @@ const DUMMY_PRODUCTS: Product[] = [
   }
 ];
 
+
+
 export default function AdminCatalogPage() {
+  const { user, isLoading, isAdmin } = useAuth();
+  const router = useRouter();
+
   const [products, setProducts] = useState<Product[]>(DUMMY_PRODUCTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/admin/login');
+      }
+    }
+  }, [user, isLoading, isAdmin, router]);
 
   // seacth
   const filteredProducts = products.filter(product => 
