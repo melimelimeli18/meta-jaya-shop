@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import ImageUpload from '@/app/components/admin/ImageUploadModal';
+import React, { useState } from "react";
+import ImageUpload from "@/src/app/components/admin/ImageUploadModal";
 
 interface HeroData {
   image: string | File;
@@ -17,11 +17,11 @@ interface HeroFormProps {
 const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>(
-    typeof initialData?.image === 'string' ? initialData.image : ''
+    typeof initialData?.image === "string" ? initialData.image : ""
   );
   const [formData, setFormData] = useState({
-    headline: initialData?.headline || '',
-    subHeadline: initialData?.subHeadline || '',
+    headline: initialData?.headline || "",
+    subHeadline: initialData?.subHeadline || "",
   });
 
   const handleImageSelect = (file: File | null) => {

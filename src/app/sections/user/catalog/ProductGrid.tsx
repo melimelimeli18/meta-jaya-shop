@@ -5,8 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Image from "next/image";
 import { DriverSpeakerN850 } from "@/client/assets/images";
 import { Container, Row, Col } from "react-bootstrap";
-import { OutlineButton } from "@/app/components/shared";
-import SearchBar from "@/app/components/shared/Searchbar";
+import { OutlineButton } from "@/src/app/components/shared";
+import SearchBar from "@/src/app/components/shared/Searchbar";
 import CategoryFilter, { FilterOption } from "./CategoryFilter";
 import styles from "./ProductGrid.module.css";
 

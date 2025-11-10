@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import ProductModal from '@/app/components/admin/ProductModal';
-import DeleteModal from '@/app/components/admin/DeleteModal';
+import React, { useState } from "react";
+import Container from "react-bootstrap/Container";
+import ProductModal from "@/src/app/components/admin/ProductModal";
+import DeleteModal from "@/src/app/components/admin/DeleteModal";
 
 interface Product {
   id: number;
@@ -29,8 +29,8 @@ const DUMMY_PRODUCTS: Product[] = [
     variant: "Merah, Biru, Hitam",
     sold: "50 Terjual",
     image: "/images/placeholder.png",
-    description: "Spek 3\" 850W",
-    link: "https://shopee.com/product/1"
+    description: 'Spek 3" 850W',
+    link: "https://shopee.com/product/1",
   },
   {
     id: 2,
@@ -41,8 +41,8 @@ const DUMMY_PRODUCTS: Product[] = [
     variant: "Putih, Hitam",
     sold: "50 Terjual",
     image: "/images/placeholder.png",
-    description: "Spek 3\" 850W",
-    link: "https://shopee.com/product/2"
+    description: 'Spek 3" 850W',
+    link: "https://shopee.com/product/2",
   },
   {
     id: 3,
@@ -53,8 +53,8 @@ const DUMMY_PRODUCTS: Product[] = [
     variant: "Silver, Gold",
     sold: "50 Terjual",
     image: "/images/placeholder.png",
-    description: "Spek 3\" 850W",
-    link: "https://shopee.com/product/3"
+    description: 'Spek 3" 850W',
+    link: "https://shopee.com/product/3",
   },
   {
     id: 4,
@@ -65,8 +65,8 @@ const DUMMY_PRODUCTS: Product[] = [
     variant: "Wireless",
     sold: "50 Terjual",
     image: "/images/placeholder.png",
-    description: "Spek 3\" 850W",
-    link: "https://shopee.com/product/4"
+    description: 'Spek 3" 850W',
+    link: "https://shopee.com/product/4",
   },
   {
     id: 5,
@@ -77,8 +77,8 @@ const DUMMY_PRODUCTS: Product[] = [
     variant: "1000W, 2000W",
     sold: "50 Terjual",
     image: "/images/placeholder.png",
-    description: "Spek 3\" 850W",
-    link: "https://shopee.com/product/5"
+    description: 'Spek 3" 850W',
+    link: "https://shopee.com/product/5",
   },
   {
     id: 6,
@@ -89,9 +89,9 @@ const DUMMY_PRODUCTS: Product[] = [
     variant: "6 Inch, 8 Inch",
     sold: "50 Terjual",
     image: "/images/placeholder.png",
-    description: "Spek 3\" 850W",
-    link: "https://shopee.com/product/6"
-  }
+    description: 'Spek 3" 850W',
+    link: "https://shopee.com/product/6",
+  },
 ];
 
 export default function AdminCatalogPage() {
@@ -103,7 +103,7 @@ export default function AdminCatalogPage() {
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
 
   // seacth
-  const filteredProducts = products.filter(product => 
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -124,7 +124,7 @@ export default function AdminCatalogPage() {
 
   const handleConfirmDelete = () => {
     if (productToDelete) {
-      setProducts(products.filter(p => p.id !== productToDelete));
+      setProducts(products.filter((p) => p.id !== productToDelete));
       setProductToDelete(null);
     }
     setIsDeleteModalOpen(false);
@@ -140,41 +140,45 @@ export default function AdminCatalogPage() {
     image?: string | File;
   }) => {
     if (currentProduct) {
-      setProducts(products.map(p => 
-        p.id === currentProduct.id 
-          ? { 
-              ...p, 
-              name: data.name,
-              price: data.price,
-              variant: data.variant,
-              link: data.link,
-              description: data.description,
-              category: data.category,
-              image: typeof data.image === 'string' 
-                ? data.image 
-                : data.image 
-                  ? URL.createObjectURL(data.image) 
-                  : p.image
-            }
-          : p
-      ));
+      setProducts(
+        products.map((p) =>
+          p.id === currentProduct.id
+            ? {
+                ...p,
+                name: data.name,
+                price: data.price,
+                variant: data.variant,
+                link: data.link,
+                description: data.description,
+                category: data.category,
+                image:
+                  typeof data.image === "string"
+                    ? data.image
+                    : data.image
+                    ? URL.createObjectURL(data.image)
+                    : p.image,
+              }
+            : p
+        )
+      );
     } else {
       // tambah produk
       const newProduct: Product = {
-        id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+        id:
+          products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1,
         name: data.name,
         category: data.category || "Stand",
         price: data.price,
         stock: "50",
         variant: data.variant,
         sold: "0 Terjual",
-        image: data.image 
-          ? (typeof data.image === 'string' 
-              ? data.image 
-              : URL.createObjectURL(data.image)) 
-          : '/images/placeholder.png',
+        image: data.image
+          ? typeof data.image === "string"
+            ? data.image
+            : URL.createObjectURL(data.image)
+          : "/images/placeholder.png",
         description: data.description,
-        link: data.link
+        link: data.link,
       };
       setProducts([...products, newProduct]);
     }
@@ -185,9 +189,14 @@ export default function AdminCatalogPage() {
       <div className="row mb-4 align-items-center">
         <div className="col-md-4">
           <div className="position-relative">
-            <span 
-              className="position-absolute" 
-              style={{ left: '15px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
+            <span
+              className="position-absolute"
+              style={{
+                left: "15px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 10,
+              }}
             >
               🔍
             </span>
@@ -197,10 +206,10 @@ export default function AdminCatalogPage() {
               placeholder="Cari barang"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ 
-                borderRadius: "25px", 
+              style={{
+                borderRadius: "25px",
                 borderColor: "#468386",
-                padding: "10px 15px 10px 40px"
+                padding: "10px 15px 10px 40px",
               }}
             />
           </div>
@@ -213,11 +222,11 @@ export default function AdminCatalogPage() {
         <div className="col-md-4 text-end">
           <button
             className="btn"
-            style={{ 
-              backgroundColor: "#468386", 
+            style={{
+              backgroundColor: "#468386",
               color: "white",
               borderRadius: "20px",
-              padding: "10px 30px"
+              padding: "10px 30px",
             }}
             onClick={handleAddProduct}
           >
@@ -233,28 +242,28 @@ export default function AdminCatalogPage() {
               <button
                 onClick={() => handleDeleteClick(product.id)}
                 className="position-absolute top-0 end-0 m-2 btn btn-sm btn-danger rounded-circle"
-                style={{ 
-                  width: "32px", 
-                  height: "32px", 
+                style={{
+                  width: "32px",
+                  height: "32px",
                   padding: 0,
                   zIndex: 10,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  border: "none"
+                  border: "none",
                 }}
               >
                 ×
               </button>
 
               <div className="position-relative">
-                <span 
+                <span
                   className="position-absolute top-0 start-0 m-2 badge bg-light text-dark"
                   style={{ fontSize: "10px" }}
                 >
                   {product.category}
                 </span>
-                <span 
+                <span
                   className="position-absolute top-0 start-50 translate-middle-x m-2 badge bg-light text-dark"
                   style={{ fontSize: "10px" }}
                 >
@@ -266,18 +275,16 @@ export default function AdminCatalogPage() {
                 src={product.image}
                 alt={product.name}
                 className="card-img-top"
-                style={{ 
-                  height: "200px", 
+                style={{
+                  height: "200px",
                   objectFit: "cover",
                   borderTopLeftRadius: "1rem",
-                  borderTopRightRadius: "1rem"
+                  borderTopRightRadius: "1rem",
                 }}
               />
 
               <div className="card-body text-center">
-                <h6 className="card-title fw-semibold mb-3">
-                  {product.name}
-                </h6>
+                <h6 className="card-title fw-semibold mb-3">{product.name}</h6>
 
                 <div className="d-flex justify-content-center align-items-center gap-3 mb-3">
                   <span className="fw-bold">{product.price}</span>
@@ -289,12 +296,12 @@ export default function AdminCatalogPage() {
 
                 <button
                   className="btn w-100"
-                  style={{ 
+                  style={{
                     backgroundColor: "white",
                     color: "#468386",
                     border: "2px solid #468386",
                     borderRadius: "20px",
-                    padding: "8px"
+                    padding: "8px",
                   }}
                   onClick={() => handleEditProduct(product)}
                 >

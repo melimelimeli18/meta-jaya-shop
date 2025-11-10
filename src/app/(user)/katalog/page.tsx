@@ -1,4 +1,4 @@
-import ProductGrid from "@/app/sections/user/catalog/ProductGrid";
+import ProductGrid from "@/src/app/sections/user/catalog/ProductGrid";
 
 export default function Catalog() {
   return (

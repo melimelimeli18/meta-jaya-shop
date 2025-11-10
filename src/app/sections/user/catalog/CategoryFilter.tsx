@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Form, Offcanvas } from "react-bootstrap";
-import { FilledButton } from "@/app/components/shared";
+import { FilledButton } from "@/src/app/components/shared";
 import styles from "./CategoryFilter.module.css";
 
 export interface FilterOption {
@@ -100,7 +100,8 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
         show={showMobile}
         onHide={onMobileClose}
         placement="start"
-        className={styles.mobileFilter}>
+        className={styles.mobileFilter}
+      >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>{title}</Offcanvas.Title>
         </Offcanvas.Header>

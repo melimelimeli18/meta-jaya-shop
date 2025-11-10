@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import PrivacyEditor from '@/app/sections/admin/edit-privacy/PrivacyEditor';
+import React, { useState } from "react";
+import Container from "react-bootstrap/Container";
+import PrivacyEditor from "@/src/app/sections/admin/edit-privacy/PrivacyEditor";
 
 // data dummy
 const INITIAL_PRIVACY_CONTENT = `1. Informasi yang Kami Kumpulkan
@@ -41,10 +41,10 @@ export default function EditPrivacyPage() {
 
   const handleSubmit = (content: string) => {
     setPrivacyContent(content);
-    
-    alert('Kebijakan Privasi berhasil diupdate!');
-    
-    console.log('Saving privacy content:', content);
+
+    alert("Kebijakan Privasi berhasil diupdate!");
+
+    console.log("Saving privacy content:", content);
   };
 
   return (
@@ -52,23 +52,24 @@ export default function EditPrivacyPage() {
       <div className="row justify-content-center">
         <div className="col-md-8">
           <h2 className="fw-bold mb-4 text-center">Edit Kebijakan Privasi</h2>
-          
-          <PrivacyEditor 
+
+          <PrivacyEditor
             initialContent={privacyContent}
             onSubmit={handleSubmit}
           />
 
           <div className="bg-white rounded-4 shadow-sm p-4 mt-4">
             <h5 className="fw-bold mb-3">Preview Kebijakan Privasi</h5>
-            <div 
+            <div
               className="p-3 bg-light rounded-3"
-              style={{ 
-                whiteSpace: 'pre-wrap',
-                maxHeight: '400px',
-                overflowY: 'auto'
+              style={{
+                whiteSpace: "pre-wrap",
+                maxHeight: "400px",
+                overflowY: "auto",
               }}
             >
-              {privacyContent || 'Konten kebijakan privasi akan muncul di sini...'}
+              {privacyContent ||
+                "Konten kebijakan privasi akan muncul di sini..."}
             </div>
           </div>
         </div>

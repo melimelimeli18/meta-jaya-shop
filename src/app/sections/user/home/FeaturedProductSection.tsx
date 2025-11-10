@@ -9,7 +9,7 @@ import {
   ComponentRCFLF08HF150,
   TweeterSpeakerRCFN850,
 } from "@/client/assets/images";
-import OutlineButton from "@/app/components/shared/OutlineButton";
+import OutlineButton from "@/src/app/components/shared/OutlineButton";
 
 function FeaturedProductSection() {
   const products = [
@@ -54,7 +54,8 @@ function FeaturedProductSection() {
         backgroundColor: "#F3F3F3",
         paddingTop: "60px",
         paddingBottom: "60px",
-      }}>
+      }}
+    >
       <Container className="text-center">
         <h2 className="fw-semibold mb-5">
           Produk <span style={{ color: "#000" }}>Unggulan</span>
@@ -64,7 +65,8 @@ function FeaturedProductSection() {
           {products.map((product) => (
             <div
               key={product.id}
-              className="product-card d-flex flex-column justify-content-between">
+              className="product-card d-flex flex-column justify-content-between"
+            >
               {/* Gambar Produk */}
               <div className="image-wrapper">
                 <Image

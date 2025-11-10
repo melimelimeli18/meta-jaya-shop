@@ -3,7 +3,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
-import FilledButton from "@/app/components/shared/FilledButton";
+import FilledButton from "@/src/app/components/shared/FilledButton";
 
 function CallToActionSection() {
   return (
@@ -12,7 +12,8 @@ function CallToActionSection() {
         backgroundColor: "#fff",
         paddingTop: "80px",
         paddingBottom: "80px",
-      }}>
+      }}
+    >
       <Container className="text-center d-flex flex-column align-items-center">
         {/* Judul */}
         <h2 className="fw-normal cta-title mb-3">
