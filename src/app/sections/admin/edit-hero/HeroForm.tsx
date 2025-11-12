@@ -1,6 +1,7 @@
+// sections/admin/edit-hero/HeroForm.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ImageUpload from "@/src/app/components/admin/ImageUploadModal";
 
 interface HeroData {
@@ -23,6 +24,20 @@ const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
     headline: initialData?.headline || "",
     subHeadline: initialData?.subHeadline || "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update form saat initialData berubah
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        headline: initialData.headline || "",
+        subHeadline: initialData.subHeadline || "",
+      });
+      if (typeof initialData.image === "string") {
+        setPreview(initialData.image);
+      }
+    }
+  }, [initialData]);
 
   const handleImageSelect = (file: File | null) => {
     setImage(file);
@@ -38,13 +53,19 @@ const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      image: image || preview,
-      headline: formData.headline,
-      subHeadline: formData.subHeadline,
-    });
+    setIsSubmitting(true);
+    
+    try {
+      await onSubmit({
+        image: image || preview,
+        headline: formData.headline,
+        subHeadline: formData.subHeadline,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -61,10 +82,11 @@ const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
             type="text"
             name="headline"
             className="form-control"
-            placeholder="Nama Produk"
+            placeholder="Headline Hero"
             value={formData.headline}
             onChange={handleChange}
             required
+            disabled={isSubmitting}
             style={{ borderColor: "#468386", borderRadius: "20px" }}
           />
         </div>
@@ -75,10 +97,11 @@ const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
             type="text"
             name="subHeadline"
             className="form-control"
-            placeholder="Nama Produk"
+            placeholder="Sub Headline Hero"
             value={formData.subHeadline}
             onChange={handleChange}
             required
+            disabled={isSubmitting}
             style={{ borderColor: "#468386", borderRadius: "20px" }}
           />
         </div>
@@ -86,6 +109,7 @@ const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
         <button
           type="submit"
           className="btn"
+          disabled={isSubmitting}
           style={{
             backgroundColor: "#468386",
             color: "white",
@@ -93,7 +117,14 @@ const HeroForm: React.FC<HeroFormProps> = ({ initialData, onSubmit }) => {
             padding: "10px 30px",
           }}
         >
-          Simpan
+          {isSubmitting ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Menyimpan...
+            </>
+          ) : (
+            "Simpan"
+          )}
         </button>
       </form>
     </div>

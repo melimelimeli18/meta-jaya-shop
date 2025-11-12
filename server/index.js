@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const dataRoutes = require("./routes/ProductsRoutes");
+const heroRoutes = require("./routes/HeroRoutes");
+const { getHero } = require("./controllers/HeroController");
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +42,9 @@ app.get("/", (req, res) => {
         "/api/products/filter?category=&minPrice=&maxPrice=&search=",
       getByCategory: "/api/products/category/:category",
       getCategories: "/api/categories",
+      getHero: "/api/hero",
+      updateHero:"PUT /api/hero",
+      uploadBanner:"POST /api/hero/upload-banner"
     },
     examples: {
       allProducts: "/api/products",
@@ -48,12 +53,14 @@ app.get("/", (req, res) => {
         "/api/products/filter?category=Electronics&minPrice=100&maxPrice=1000",
       byCategory: "/api/products/category/Electronics",
       categories: "/api/categories",
+      hero: "/api/hero"
     },
   });
 });
 
 // API Routes
 app.use("/api", dataRoutes);
+app.use("/api/hero", heroRoutes);
 
 // 404 Handler
 app.use((req, res) => {
