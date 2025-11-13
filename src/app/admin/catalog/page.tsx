@@ -1,108 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import ProductModal from "@/src/app/components/admin/ProductModal";
 import DeleteModal from "@/src/app/components/admin/DeleteModal";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   category: string;
-  price: string;
-  stock: string;
-  variant: string;
-  sold: string;
+  price: number;
+  stock?: string;
+  variant?: string;
+  sold: number;
   image: string;
   description: string;
   link: string;
 }
 
-// data dummy - nanti ambil dari API atau database
-const DUMMY_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-    category: "Stand",
-    price: "Rp350.000",
-    stock: "50",
-    variant: "Merah, Biru, Hitam",
-    sold: "50 Terjual",
-    image: "/images/placeholder.png",
-    description: 'Spek 3" 850W',
-    link: "https://shopee.com/product/1",
-  },
-  {
-    id: 2,
-    name: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-    category: "Stand",
-    price: "Rp350.000",
-    stock: "50",
-    variant: "Putih, Hitam",
-    sold: "50 Terjual",
-    image: "/images/placeholder.png",
-    description: 'Spek 3" 850W',
-    link: "https://shopee.com/product/2",
-  },
-  {
-    id: 3,
-    name: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-    category: "Stand",
-    price: "Rp350.000",
-    stock: "50",
-    variant: "Silver, Gold",
-    sold: "50 Terjual",
-    image: "/images/placeholder.png",
-    description: 'Spek 3" 850W',
-    link: "https://shopee.com/product/3",
-  },
-  {
-    id: 4,
-    name: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-    category: "Microphone",
-    price: "Rp350.000",
-    stock: "50",
-    variant: "Wireless",
-    sold: "50 Terjual",
-    image: "/images/placeholder.png",
-    description: 'Spek 3" 850W',
-    link: "https://shopee.com/product/4",
-  },
-  {
-    id: 5,
-    name: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-    category: "Power Amplifier",
-    price: "Rp350.000",
-    stock: "50",
-    variant: "1000W, 2000W",
-    sold: "50 Terjual",
-    image: "/images/placeholder.png",
-    description: 'Spek 3" 850W',
-    link: "https://shopee.com/product/5",
-  },
-  {
-    id: 6,
-    name: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-    category: "Kit Power/ Modul Speaker",
-    price: "Rp350.000",
-    stock: "50",
-    variant: "6 Inch, 8 Inch",
-    sold: "50 Terjual",
-    image: "/images/placeholder.png",
-    description: 'Spek 3" 850W',
-    link: "https://shopee.com/product/6",
-  },
-];
+interface ProductModalData {
+  name: string;
+  price: string;
+  variant?: string;
+  link: string;
+  description: string;
+  category: string;
+  image?: string | File;
+}
+
+const API_URL = "http://localhost:5000/products";
 
 export default function AdminCatalogPage() {
-  const [products, setProducts] = useState<Product[]>(DUMMY_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
-  const [productToDelete, setProductToDelete] = useState<number | null>(null);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  // seacth
+  // Fetch products dari API
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(API_URL);
+      const result = await response.json();
+
+      if (result.success) {
+        setProducts(result.data);
+      } else {
+        setError("Gagal memuat produk");
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan saat memuat produk");
+      console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search filter
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -117,37 +80,31 @@ export default function AdminCatalogPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = (id: string) => {
     setProductToDelete(id);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
     if (productToDelete) {
+      // TODO: Implementasi DELETE ke API
       setProducts(products.filter((p) => p.id !== productToDelete));
       setProductToDelete(null);
     }
     setIsDeleteModalOpen(false);
   };
 
-  const handleSubmitProduct = (data: {
-    name: string;
-    price: string;
-    variant: string;
-    link: string;
-    description: string;
-    category: string;
-    image?: string | File;
-  }) => {
+  const handleSubmitProduct = (data: ProductModalData) => {
     if (currentProduct) {
+      // TODO: Implementasi UPDATE ke API
       setProducts(
         products.map((p) =>
           p.id === currentProduct.id
             ? {
                 ...p,
                 name: data.name,
-                price: data.price,
-                variant: data.variant,
+                price: parseFloat(data.price.replace(/[^0-9]/g, "") || "0"),
+                variant: data.variant || "",
                 link: data.link,
                 description: data.description,
                 category: data.category,
@@ -162,16 +119,14 @@ export default function AdminCatalogPage() {
         )
       );
     } else {
-      // tambah produk
+      // TODO: Implementasi CREATE ke API
       const newProduct: Product = {
-        id:
-          products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1,
+        id: `${Date.now()}`,
         name: data.name,
         category: data.category || "Stand",
-        price: data.price,
-        stock: "50",
+        price: parseFloat(data.price.replace(/[^0-9]/g, "") || "0"),
+        sold: 0,
         variant: data.variant,
-        sold: "0 Terjual",
         image: data.image
           ? typeof data.image === "string"
             ? data.image
@@ -183,6 +138,38 @@ export default function AdminCatalogPage() {
       setProducts([...products, newProduct]);
     }
   };
+
+  const formatPrice = (price: number) => {
+    return `Rp${price.toLocaleString("id-ID")}`;
+  };
+
+  if (loading) {
+    return (
+      <Container fluid className="py-4">
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3">Memuat produk...</p>
+        </div>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container fluid className="py-4">
+        <div className="alert alert-danger" role="alert">
+          {error}
+          <button
+            className="btn btn-sm btn-outline-danger ms-3"
+            onClick={fetchProducts}>
+            Coba Lagi
+          </button>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4">
@@ -196,8 +183,7 @@ export default function AdminCatalogPage() {
                 top: "50%",
                 transform: "translateY(-50%)",
                 zIndex: 10,
-              }}
-            >
+              }}>
               🔍
             </span>
             <input
@@ -228,90 +214,93 @@ export default function AdminCatalogPage() {
               borderRadius: "20px",
               padding: "10px 30px",
             }}
-            onClick={handleAddProduct}
-          >
+            onClick={handleAddProduct}>
             Tambah Produk
           </button>
         </div>
       </div>
 
-      <div className="row g-4">
-        {filteredProducts.map((product) => (
-          <div key={product.id} className="col-md-4">
-            <div className="card h-100 shadow-sm border-0 rounded-4 position-relative">
-              <button
-                onClick={() => handleDeleteClick(product.id)}
-                className="position-absolute top-0 end-0 m-2 btn btn-sm btn-danger rounded-circle"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  padding: 0,
-                  zIndex: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "none",
-                }}
-              >
-                ×
-              </button>
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-5">
+          <p className="text-muted">Tidak ada produk ditemukan</p>
+        </div>
+      ) : (
+        <div className="row g-4">
+          {filteredProducts.map((product) => (
+            <div key={product.id} className="col-md-4">
+              <div className="card h-100 shadow-sm border-0 rounded-4 position-relative">
+                <button
+                  onClick={() => handleDeleteClick(product.id)}
+                  className="position-absolute top-0 end-0 m-2 btn btn-sm btn-danger rounded-circle"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    padding: 0,
+                    zIndex: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "none",
+                  }}>
+                  ×
+                </button>
 
-              <div className="position-relative">
-                <span
-                  className="position-absolute top-0 start-0 m-2 badge bg-light text-dark"
-                  style={{ fontSize: "10px" }}
-                >
-                  {product.category}
-                </span>
-                <span
-                  className="position-absolute top-0 start-50 translate-middle-x m-2 badge bg-light text-dark"
-                  style={{ fontSize: "10px" }}
-                >
-                  Spek 3&quot; 850W
-                </span>
-              </div>
-
-              <img
-                src={product.image}
-                alt={product.name}
-                className="card-img-top"
-                style={{
-                  height: "200px",
-                  objectFit: "cover",
-                  borderTopLeftRadius: "1rem",
-                  borderTopRightRadius: "1rem",
-                }}
-              />
-
-              <div className="card-body text-center">
-                <h6 className="card-title fw-semibold mb-3">{product.name}</h6>
-
-                <div className="d-flex justify-content-center align-items-center gap-3 mb-3">
-                  <span className="fw-bold">{product.price}</span>
-                  <span className="text-warning">⭐ {product.stock}</span>
-                  <span className="text-muted" style={{ fontSize: "14px" }}>
-                    {product.sold}
+                <div className="position-relative">
+                  <span
+                    className="position-absolute top-0 start-0 m-2 badge bg-light text-dark"
+                    style={{ fontSize: "10px" }}>
+                    {product.category}
                   </span>
                 </div>
 
-                <button
-                  className="btn w-100"
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="card-img-top"
                   style={{
-                    backgroundColor: "white",
-                    color: "#468386",
-                    border: "2px solid #468386",
-                    borderRadius: "20px",
-                    padding: "8px",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderTopLeftRadius: "1rem",
+                    borderTopRightRadius: "1rem",
                   }}
-                  onClick={() => handleEditProduct(product)}
-                >
-                  Edit Produk
-                </button>
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "/images/placeholder.png";
+                  }}
+                />
+
+                <div className="card-body text-center">
+                  <h6 className="card-title fw-semibold mb-3">
+                    {product.name}
+                  </h6>
+
+                  <div className="d-flex justify-content-center align-items-center gap-3 mb-3">
+                    <span className="fw-bold">
+                      {formatPrice(product.price)}
+                    </span>
+                    <span className="text-muted" style={{ fontSize: "14px" }}>
+                      {product.sold} Terjual
+                    </span>
+                  </div>
+
+                  <button
+                    className="btn w-100"
+                    style={{
+                      backgroundColor: "white",
+                      color: "#468386",
+                      border: "2px solid #468386",
+                      borderRadius: "20px",
+                      padding: "8px",
+                    }}
+                    onClick={() => handleEditProduct(product)}>
+                    Edit Produk
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <ProductModal
         isOpen={isModalOpen}
