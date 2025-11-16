@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const dataRoutes = require("./routes/ProductsRoutes");
+// const dataRoutes = require("./routes/ProductRoutes");
 const heroRoutes = require("./routes/HeroRoutes");
 const { getHero } = require("./controllers/HeroController");
 
@@ -185,12 +185,12 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-app.use("/api", dataRoutes);
+// app.use("/api", dataRoutes);
+app.use("/api", productRoutes);
 app.use("/api/hero", heroRoutes);
 
 // 404 Handler
 // Mount API routes
-app.use("/", productRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
