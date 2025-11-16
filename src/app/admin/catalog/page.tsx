@@ -28,7 +28,7 @@ interface ProductModalData {
   image?: string | File;
 }
 
-const API_URL = "http://localhost:5000/products";
+const API_URL = "http://localhost:5000/api/products";
 
 export default function AdminCatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);

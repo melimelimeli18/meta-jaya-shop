@@ -1,4 +1,3 @@
-// server/controllers/products/getProducts.js
 const supabase = require("../../config/supabase");
 
 /**

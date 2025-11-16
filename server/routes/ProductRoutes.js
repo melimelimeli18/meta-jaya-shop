@@ -1,15 +1,11 @@
-// server/routes/ProductRoutes.js
 const express = require("express");
 const router = express.Router();
 
-// Import controllers from separate files
-// Make sure these paths match your folder structure
 const getProductsController = require("../controllers/products/getProducts");
 const createProductsController = require("../controllers/products/createProducts");
 const updateProductsController = require("../controllers/products/updateProducts");
 const deleteProductsController = require("../controllers/products/deleteProducts");
 
-// Destructure functions from imported modules
 const {
   getAllProducts,
   getProductById,
@@ -36,7 +32,7 @@ const {
   deleteProductsWithFilters,
 } = deleteProductsController;
 
-// ========== Base Route ==========
+// Base Route
 router.get("/", (req, res) => {
   res.json({
     success: true,
@@ -74,7 +70,6 @@ router.get("/", (req, res) => {
 });
 
 // ========== GET Routes ==========
-// PENTING: Routes dengan path spesifik harus di atas routes dengan params
 router.get("/categories", getCategories);
 router.get("/products/stats", getProductStats);
 router.get("/products/top-selling", getTopSellingProducts);
@@ -83,22 +78,21 @@ router.get("/products/category/:category", getProductsByCategory);
 router.get("/products", getAllProducts);
 router.get("/products/:id", getProductById);
 
-// ========== POST Routes ==========
+// POST Routes
 router.post("/products/bulk", createMultipleProducts);
 router.post("/products", createProduct);
 
-// ========== PUT/PATCH Routes ==========
+// PUT/PATCH Routes
 router.patch("/products/bulk", updateMultipleProducts);
 router.patch("/products/:id/sold", incrementProductSold);
 router.patch("/products/:id/price", updateProductPrice);
 router.put("/products/:id", updateProduct);
 router.patch("/products/:id", updateProduct);
 
-// ========== DELETE Routes ==========
+// DELETE Routes
 router.delete("/products/filter", deleteProductsWithFilters);
 router.delete("/products/bulk", deleteMultipleProducts);
 router.delete("/products/category/:category", deleteProductsByCategory);
 router.delete("/products/:id", deleteProduct);
 
-// Export router as default
 module.exports = router;

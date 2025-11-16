@@ -1,4 +1,3 @@
-// server/controllers/products/deleteProducts.js
 const supabase = require("../../config/supabase");
 
 /**

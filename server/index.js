@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-// const dataRoutes = require("./routes/ProductRoutes");
+const dataRoutes = require("./routes/ProductRoutes");
 const heroRoutes = require("./routes/HeroRoutes");
 const { getHero } = require("./controllers/HeroController");
 

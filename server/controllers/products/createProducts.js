@@ -1,4 +1,3 @@
-// server/controllers/products/createProducts.js
 const supabase = require("../../config/supabase");
 const { validateProduct } = require("../../validator/productValidator");
 
