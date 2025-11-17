@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
-import ImageUpload from "./ImageUploadModal";
 
 interface Product {
   id?: number;
@@ -10,28 +9,24 @@ interface Product {
   link: string;
   description: string;
   category: string;
-  image?: string | File;
-  stock?: string;
-  sold?: string;
 }
 
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  onSubmit: (data: Product) => void;
+  onSubmit: (data: Product) => void; // <-- data dikirim sesuai API backend
   initialData?: Product | null;
 }
 
-const ProductModal: React.FC<ProductModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  title, 
+const ProductModal: React.FC<ProductModalProps> = ({
+  isOpen,
+  onClose,
+  title,
   onSubmit,
-  initialData 
+  initialData,
 }) => {
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>("");
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -40,6 +35,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
     description: "",
     category: "Stand",
   });
+
+  const formatRupiah = (value: string) => {
+    const numberString = value.replace(/[^0-9]/g, "");
+    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -51,9 +51,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
         description: initialData.description || "",
         category: initialData.category || "Stand",
       });
-      if (initialData.image && typeof initialData.image === 'string') {
-        setPreview(initialData.image);
-      }
     } else {
       setFormData({
         name: "",
@@ -63,29 +60,36 @@ const ProductModal: React.FC<ProductModalProps> = ({
         description: "",
         category: "Stand",
       });
-      setPreview("");
     }
   }, [initialData, isOpen]);
 
-  const handleImageSelect = (file: File | null) => {
-    setImage(file);
-    if (file) setPreview(URL.createObjectURL(file));
-    else setPreview("");
-  };
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    if (name === "price") {
+      setFormData({ ...formData, price: formatRupiah(value) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ⛔ Tidak ada image. Sesuai backend, kirim data biasa.
     const submitData: Product = {
-      ...formData,
-      image: image || preview
+      name: formData.name,
+      price: formData.price,
+      variant: formData.variant,
+      link: formData.link,
+      description: formData.description,
+      category: formData.category,
     };
+
     onSubmit(submitData);
     handleClose();
   };
@@ -99,8 +103,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
       description: "",
       category: "Stand",
     });
-    setImage(null);
-    setPreview("");
     onClose();
   };
 
@@ -108,27 +110,25 @@ const ProductModal: React.FC<ProductModalProps> = ({
     <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">{title}</h5>
-        <button 
+        <button
           onClick={handleClose}
-          style={{ 
-            background: "none", 
-            border: "none", 
-            fontSize: "24px", 
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "24px",
             cursor: "pointer",
-            color: "#666"
+            color: "#666",
           }}
         >
           ×
         </button>
       </div>
-      
+
       <form onSubmit={handleSubmit}>
         <div className="row">
+
+          {/* === KOLOM KIRI === */}
           <div className="col-md-6">
-            <div className="mb-3">
-              <label className="form-label fw-semibold">Foto Produk</label>
-              <ImageUpload onImageSelect={handleImageSelect} preview={preview} />
-            </div>
 
             <div className="mb-3">
               <label className="form-label fw-semibold">Nama Produk</label>
@@ -158,18 +158,27 @@ const ProductModal: React.FC<ProductModalProps> = ({
               />
             </div>
 
+            {/* CATEGORY */}
             <div className="mb-3">
-              <label className="form-label fw-semibold">Variasi Produk</label>
-              <input
-                type="text"
+              <label className="form-label fw-semibold">Category</label>
+              <select
                 name="variant"
                 className="form-control"
-                placeholder="Contoh: Merah, Biru, Hitam"
                 value={formData.variant}
                 onChange={handleChange}
                 required
                 style={{ borderColor: "#468386", borderRadius: "20px" }}
-              />
+              >
+                <option value="">Pilih Category</option>
+                <option value="Tweeter / Driver">Tweeter / Driver</option>
+                <option value="Stand">Stand</option>
+                <option value="Microphone">Microphone</option>
+                <option value="Power Amplifier">Power Amplifier</option>
+                <option value="Kit Power / Modul Speaker">Kit Power / Modul Speaker</option>
+                <option value="Portable Speaker">Portable Speaker</option>
+                <option value="Speaker Component / Komponen">Speaker Component / Komponen</option>
+                <option value="Mixer Audio">Mixer Audio</option>
+              </select>
             </div>
 
             <div className="mb-3">
@@ -186,8 +195,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
             </div>
           </div>
 
+          {/* === KOLOM KANAN === */}
           <div className="col-md-6">
-            <div className="mb-3">
+            <div className="mb-3" style={{ height: "100%" }}>
               <label className="form-label fw-semibold">Deskripsi Produk</label>
               <textarea
                 name="description"
@@ -195,8 +205,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 placeholder="Deskripsi Produk"
                 value={formData.description}
                 onChange={handleChange}
-                rows={10}
-                style={{ borderColor: "#468386", borderRadius: "20px" }}
+                style={{
+                  borderColor: "#468386",
+                  borderRadius: "20px",
+                  height: "100%",
+                }}
               />
             </div>
           </div>
@@ -206,11 +219,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
           <button
             type="submit"
             className="btn"
-            style={{ 
-              backgroundColor: "#468386", 
-              color: "white", 
-              borderRadius: "20px", 
-              padding: "8px 30px" 
+            style={{
+              backgroundColor: "#468386",
+              color: "white",
+              borderRadius: "20px",
+              padding: "8px 30px",
             }}
           >
             Terapkan
