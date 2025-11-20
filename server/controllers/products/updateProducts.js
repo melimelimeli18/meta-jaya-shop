@@ -1,3 +1,4 @@
+// server\controllers\products\updateProducts.js
 const supabase = require("../../config/supabase");
 const { validateProductUpdate } = require("../../validator/productValidator");
 

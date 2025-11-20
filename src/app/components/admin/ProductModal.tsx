@@ -1,21 +1,23 @@
+// src/app/components/admin/ProductModal.tsx
+
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 interface Product {
-  id?: number;
+  id?: string; // Changed from number to string (database uses text)
   name: string;
-  price: string;
-  variant: string;
+  price: number; // Changed from string to number (API expects number)
+  category: string; // Changed from variant to category (database field)
   link: string;
   description: string;
-  category: string;
+  image?: string | null; // Added image field (database field)
 }
 
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  onSubmit: (data: Product) => void; // <-- data dikirim sesuai API backend
+  onSubmit: (data: Product) => void;
   initialData?: Product | null;
 }
 
@@ -26,14 +28,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
   onSubmit,
   initialData,
 }) => {
-
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    variant: "",
+    category: "Stand",
     link: "",
     description: "",
-    category: "Stand",
+    image: "",
   });
 
   const formatRupiah = (value: string) => {
@@ -41,24 +42,33 @@ const ProductModal: React.FC<ProductModalProps> = ({
     return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const parseRupiah = (value: string): number => {
+    // Remove dots and convert to number
+    const numberString = value.replace(/\./g, "");
+    return parseInt(numberString, 10) || 0;
+  };
+
   useEffect(() => {
     if (initialData) {
       setFormData({
         name: initialData.name || "",
-        price: initialData.price || "",
-        variant: initialData.variant || "",
+        price:
+          typeof initialData.price === "number"
+            ? formatRupiah(initialData.price.toString())
+            : initialData.price || "",
+        category: initialData.category || "Stand",
         link: initialData.link || "",
         description: initialData.description || "",
-        category: initialData.category || "Stand",
+        image: initialData.image || "",
       });
     } else {
       setFormData({
         name: "",
         price: "",
-        variant: "",
+        category: "Stand",
         link: "",
         description: "",
-        category: "Stand",
+        image: "",
       });
     }
   }, [initialData, isOpen]);
@@ -80,15 +90,20 @@ const ProductModal: React.FC<ProductModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ⛔ Tidak ada image. Sesuai backend, kirim data biasa.
+    // Convert price from formatted string to number
+    const priceNumber = parseRupiah(formData.price);
+
+    // Prepare data according to API requirements
     const submitData: Product = {
-      name: formData.name,
-      price: formData.price,
-      variant: formData.variant,
-      link: formData.link,
-      description: formData.description,
+      name: formData.name.trim(),
+      price: priceNumber, // Send as number
       category: formData.category,
+      link: formData.link.trim(),
+      description: formData.description.trim() || "", // Ensure not undefined
+      image: formData.image.trim() || null, // Send null if empty
     };
+
+    console.log("Submitting product data:", submitData);
 
     onSubmit(submitData);
     handleClose();
@@ -98,10 +113,10 @@ const ProductModal: React.FC<ProductModalProps> = ({
     setFormData({
       name: "",
       price: "",
-      variant: "",
+      category: "Stand",
       link: "",
       description: "",
-      category: "Stand",
+      image: "",
     });
     onClose();
   };
@@ -118,25 +133,24 @@ const ProductModal: React.FC<ProductModalProps> = ({
             fontSize: "24px",
             cursor: "pointer",
             color: "#666",
-          }}
-        >
+          }}>
           ×
         </button>
       </div>
 
       <form onSubmit={handleSubmit}>
         <div className="row">
-
           {/* === KOLOM KIRI === */}
           <div className="col-md-6">
-
             <div className="mb-3">
-              <label className="form-label fw-semibold">Nama Produk</label>
+              <label className="form-label fw-semibold">
+                Nama Produk <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 name="name"
                 className="form-control"
-                placeholder="Nama Produk"
+                placeholder="Contoh: Speaker Aktif 12 Inch"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -145,77 +159,117 @@ const ProductModal: React.FC<ProductModalProps> = ({
             </div>
 
             <div className="mb-3">
-              <label className="form-label fw-semibold">Harga Produk</label>
+              <label className="form-label fw-semibold">
+                Harga Produk (Rp) <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 name="price"
                 className="form-control"
-                placeholder="Harga Produk"
+                placeholder="Contoh: 1.500.000"
                 value={formData.price}
                 onChange={handleChange}
                 required
                 style={{ borderColor: "#468386", borderRadius: "20px" }}
               />
+              <small className="text-muted">Format otomatis: 1.500.000</small>
             </div>
 
             {/* CATEGORY */}
             <div className="mb-3">
-              <label className="form-label fw-semibold">Category</label>
+              <label className="form-label fw-semibold">
+                Category <span className="text-danger">*</span>
+              </label>
               <select
-                name="variant"
+                name="category"
                 className="form-control"
-                value={formData.variant}
+                value={formData.category}
                 onChange={handleChange}
                 required
-                style={{ borderColor: "#468386", borderRadius: "20px" }}
-              >
+                style={{ borderColor: "#468386", borderRadius: "20px" }}>
                 <option value="">Pilih Category</option>
                 <option value="Tweeter / Driver">Tweeter / Driver</option>
                 <option value="Stand">Stand</option>
                 <option value="Microphone">Microphone</option>
                 <option value="Power Amplifier">Power Amplifier</option>
-                <option value="Kit Power / Modul Speaker">Kit Power / Modul Speaker</option>
+                <option value="Kit Power / Modul Speaker">
+                  Kit Power / Modul Speaker
+                </option>
                 <option value="Portable Speaker">Portable Speaker</option>
-                <option value="Speaker Component / Komponen">Speaker Component / Komponen</option>
+                <option value="Speaker Component / Komponen">
+                  Speaker Component / Komponen
+                </option>
                 <option value="Mixer Audio">Mixer Audio</option>
               </select>
             </div>
 
             <div className="mb-3">
-              <label className="form-label fw-semibold">Link Produk</label>
+              <label className="form-label fw-semibold">
+                Link Produk <span className="text-danger">*</span>
+              </label>
               <input
-                type="text"
+                type="url"
                 name="link"
                 className="form-control"
-                placeholder="Link Produk"
+                placeholder="https://tokopedia.com/..."
                 value={formData.link}
                 onChange={handleChange}
+                required
                 style={{ borderColor: "#468386", borderRadius: "20px" }}
               />
+              <small className="text-muted">URL lengkap dengan https://</small>
             </div>
           </div>
 
           {/* === KOLOM KANAN === */}
           <div className="col-md-6">
-            <div className="mb-3" style={{ height: "100%" }}>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">URL Gambar</label>
+              <input
+                type="url"
+                name="image"
+                className="form-control"
+                placeholder="https://example.com/image.jpg"
+                value={formData.image}
+                onChange={handleChange}
+                style={{ borderColor: "#468386", borderRadius: "20px" }}
+              />
+              <small className="text-muted">Opsional - URL gambar produk</small>
+            </div>
+
+            <div className="mb-3" style={{ height: "calc(100% - 100px)" }}>
               <label className="form-label fw-semibold">Deskripsi Produk</label>
               <textarea
                 name="description"
                 className="form-control"
-                placeholder="Deskripsi Produk"
+                placeholder="Deskripsi detail produk..."
                 value={formData.description}
                 onChange={handleChange}
                 style={{
                   borderColor: "#468386",
                   borderRadius: "20px",
                   height: "100%",
+                  minHeight: "200px",
                 }}
               />
+              <small className="text-muted">
+                Opsional - Detail spesifikasi produk
+              </small>
             </div>
           </div>
         </div>
 
-        <div className="text-end">
+        <div className="text-end mt-3">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="btn btn-outline-secondary me-2"
+            style={{
+              borderRadius: "20px",
+              padding: "8px 30px",
+            }}>
+            Batal
+          </button>
           <button
             type="submit"
             className="btn"
@@ -224,8 +278,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               color: "white",
               borderRadius: "20px",
               padding: "8px 30px",
-            }}
-          >
+            }}>
             Terapkan
           </button>
         </div>
