@@ -84,7 +84,6 @@ router.post("/products", createProduct);
 
 // PUT/PATCH Routes
 router.patch("/products/bulk", updateMultipleProducts);
-router.patch("/products/:id/sold", incrementProductSold);
 router.patch("/products/:id/price", updateProductPrice);
 router.put("/products/:id", updateProduct);
 router.patch("/products/:id", updateProduct);

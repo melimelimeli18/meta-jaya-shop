@@ -145,65 +145,6 @@ const updateMultipleProducts = async (req, res) => {
 };
 
 /**
- * PATCH increment product sold count
- */
-const incrementProductSold = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { quantity = 1 } = req.body;
-
-    if (typeof quantity !== "number" || quantity < 1) {
-      return res.status(400).json({
-        success: false,
-        message: "Quantity must be a positive number",
-      });
-    }
-
-    // Get current product
-    const { data: product, error: fetchError } = await supabase
-      .from("products")
-      .select("sold")
-      .eq("id", id)
-      .single();
-
-    if (fetchError || !product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    // Increment sold count
-    const { data, error } = await supabase
-      .from("products")
-      .update({ sold: (product.sold || 0) + quantity })
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: "Error updating sold count",
-        error: error.message,
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: `Sold count incremented by ${quantity}`,
-      data: data,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
-
-/**
  * PATCH update product price
  */
 const updateProductPrice = async (req, res) => {
@@ -265,6 +206,5 @@ const updateProductPrice = async (req, res) => {
 module.exports = {
   updateProduct,
   updateMultipleProducts,
-  incrementProductSold,
   updateProductPrice,
 };

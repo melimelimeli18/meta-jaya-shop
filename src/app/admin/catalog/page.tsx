@@ -26,6 +26,9 @@ interface ProductModalData {
   image?: string | null;
 }
 
+// Backend API Base URL
+const API_BASE_URL = "http://localhost:5000/api";
+
 export default function AdminCatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +53,7 @@ export default function AdminCatalogPage() {
       setError(null);
       console.log("Fetching products...");
 
-      const response = await fetch("http://localhost:5000/api/products");
+      const response = await fetch(`${API_BASE_URL}/products`);
       const result = await response.json();
 
       console.log("Fetch result:", result);
@@ -131,7 +134,7 @@ export default function AdminCatalogPage() {
         console.log("Updating product with id:", currentProduct.id);
 
         const response = await fetch(`/api/products/${currentProduct.id}`, {
-          method: "PUT",
+          method: "PATCH", // Menggunakan PATCH sesuai backend
           headers: {
             "Content-Type": "application/json",
           },
@@ -160,7 +163,7 @@ export default function AdminCatalogPage() {
         // ===== CREATE PRODUCT =====
         console.log("Creating new product...");
 
-        const response = await fetch("http://localhost:5000/api/products", {
+        const response = await fetch(`${API_BASE_URL}/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
