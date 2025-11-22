@@ -4,13 +4,14 @@ import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 interface Product {
-  id?: string; // Changed from number to string (database uses text)
+  id?: string;
   name: string;
-  price: number; // Changed from string to number (API expects number)
-  category: string; // Changed from variant to category (database field)
+  price: number;
+  category: string;
   link: string;
   description: string;
-  image?: string | null; // Added image field (database field)
+  image?: string | null;
+  file?: File | null;
 }
 
 interface ProductModalProps {
@@ -28,13 +29,16 @@ const ProductModal: React.FC<ProductModalProps> = ({
   onSubmit,
   initialData,
 }) => {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     category: "Stand",
     link: "",
     description: "",
-    image: "",
+    file: null as File | null,
   });
 
   const formatRupiah = (value: string) => {
@@ -43,7 +47,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
   };
 
   const parseRupiah = (value: string): number => {
-    // Remove dots and convert to number
     const numberString = value.replace(/\./g, "");
     return parseInt(numberString, 10) || 0;
   };
@@ -59,8 +62,12 @@ const ProductModal: React.FC<ProductModalProps> = ({
         category: initialData.category || "Stand",
         link: initialData.link || "",
         description: initialData.description || "",
-        image: initialData.image || "",
+        file: null,
       });
+
+      if (initialData.image) {
+        setPreview(initialData.image);
+      }
     } else {
       setFormData({
         name: "",
@@ -68,8 +75,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
         category: "Stand",
         link: "",
         description: "",
-        image: "",
+        file: null,
       });
+      setPreview(null);
     }
   }, [initialData, isOpen]);
 
@@ -87,26 +95,72 @@ const ProductModal: React.FC<ProductModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+
+    setFormData({ ...formData, file });
+
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setPreview(previewUrl);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
 
-    // Convert price from formatted string to number
-    const priceNumber = parseRupiah(formData.price);
+    try {
+      const priceNumber = parseRupiah(formData.price);
 
-    // Prepare data according to API requirements
-    const submitData: Product = {
-      name: formData.name.trim(),
-      price: priceNumber, // Send as number
-      category: formData.category,
-      link: formData.link.trim(),
-      description: formData.description.trim() || "", // Ensure not undefined
-      image: formData.image.trim() || null, // Send null if empty
-    };
+      let imageUrl = initialData?.image || null;
 
-    console.log("Submitting product data:", submitData);
+      // Upload image if file is selected
+      if (formData.file) {
+        const formDataToSend = new FormData();
+        formDataToSend.append("image", formData.file); // Pastikan field name adalah "image"
 
-    onSubmit(submitData);
-    handleClose();
+        console.log("Uploading image:", formData.file.name);
+
+        const uploadResponse = await fetch(
+          "http://localhost:5000/api/upload-image",
+          {
+            method: "POST",
+            body: formDataToSend,
+          }
+        );
+
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json();
+          throw new Error(errorData.message || "Failed to upload image");
+        }
+
+        const uploadResult = await uploadResponse.json();
+        imageUrl = uploadResult.data.publicUrl;
+      }
+
+      const submitData: Product = {
+        ...(initialData?.id && { id: initialData.id }),
+        name: formData.name.trim(),
+        price: priceNumber,
+        category: formData.category,
+        link: formData.link.trim(),
+        description: formData.description.trim(),
+        image: imageUrl,
+      };
+
+      console.log("Submitting product data:", submitData);
+
+      onSubmit(submitData);
+      handleClose();
+    } catch (error) {
+      console.error("Error submitting product:", error);
+      alert(
+        error instanceof Error ? error.message : "Failed to submit product"
+      );
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleClose = () => {
@@ -116,8 +170,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
       category: "Stand",
       link: "",
       description: "",
-      image: "",
+      file: null,
     });
+    setPreview(null);
     onClose();
   };
 
@@ -140,8 +195,46 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
       <form onSubmit={handleSubmit}>
         <div className="row">
-          {/* === KOLOM KIRI === */}
+          {/* === KIRI === */}
           <div className="col-md-6">
+            {/* UPLOAD IMAGE */}
+            <div className="mb-3">
+              <label className="form-label fw-semibold">
+                Foto Produk <span className="text-danger">*</span>
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control"
+                onChange={handleFileChange}
+                style={{ borderColor: "#468386", borderRadius: "20px" }}
+                required={!initialData?.image}
+              />
+
+              {formData.file && (
+                <div className="mt-2">
+                  <strong>File:</strong> {formData.file.name}
+                </div>
+              )}
+
+              {preview && (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="mt-2"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                    border: "2px solid #ddd",
+                  }}
+                />
+              )}
+            </div>
+
+            {/* NAME */}
             <div className="mb-3">
               <label className="form-label fw-semibold">
                 Nama Produk <span className="text-danger">*</span>
@@ -158,6 +251,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               />
             </div>
 
+            {/* PRICE */}
             <div className="mb-3">
               <label className="form-label fw-semibold">
                 Harga Produk (Rp) <span className="text-danger">*</span>
@@ -166,7 +260,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 type="text"
                 name="price"
                 className="form-control"
-                placeholder="Contoh: 1.500.000"
+                placeholder="1.500.000"
                 value={formData.price}
                 onChange={handleChange}
                 required
@@ -177,9 +271,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
             {/* CATEGORY */}
             <div className="mb-3">
-              <label className="form-label fw-semibold">
-                Category <span className="text-danger">*</span>
-              </label>
+              <label className="form-label fw-semibold">Category</label>
               <select
                 name="category"
                 className="form-control"
@@ -187,7 +279,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 onChange={handleChange}
                 required
                 style={{ borderColor: "#468386", borderRadius: "20px" }}>
-                <option value="">Pilih Category</option>
                 <option value="Tweeter / Driver">Tweeter / Driver</option>
                 <option value="Stand">Stand</option>
                 <option value="Microphone">Microphone</option>
@@ -204,9 +295,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
             </div>
 
             <div className="mb-3">
-              <label className="form-label fw-semibold">
-                Link Produk <span className="text-danger">*</span>
-              </label>
+              <label className="form-label fw-semibold">Link Produk</label>
               <input
                 type="url"
                 name="link"
@@ -214,30 +303,14 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 placeholder="https://tokopedia.com/..."
                 value={formData.link}
                 onChange={handleChange}
-                required
                 style={{ borderColor: "#468386", borderRadius: "20px" }}
               />
-              <small className="text-muted">URL lengkap dengan https://</small>
             </div>
           </div>
 
-          {/* === KOLOM KANAN === */}
+          {/* === KANAN === */}
           <div className="col-md-6">
-            <div className="mb-3">
-              <label className="form-label fw-semibold">URL Gambar</label>
-              <input
-                type="url"
-                name="image"
-                className="form-control"
-                placeholder="https://example.com/image.jpg"
-                value={formData.image}
-                onChange={handleChange}
-                style={{ borderColor: "#468386", borderRadius: "20px" }}
-              />
-              <small className="text-muted">Opsional - URL gambar produk</small>
-            </div>
-
-            <div className="mb-3" style={{ height: "calc(100% - 100px)" }}>
+            <div className="mb-3" style={{ height: "calc(100% - 60px)" }}>
               <label className="form-label fw-semibold">Deskripsi Produk</label>
               <textarea
                 name="description"
@@ -252,9 +325,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
                   minHeight: "200px",
                 }}
               />
-              <small className="text-muted">
-                Opsional - Detail spesifikasi produk
-              </small>
             </div>
           </div>
         </div>
@@ -267,9 +337,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
             style={{
               borderRadius: "20px",
               padding: "8px 30px",
-            }}>
+            }}
+            disabled={uploading}>
             Batal
           </button>
+
           <button
             type="submit"
             className="btn"
@@ -278,8 +350,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
               color: "white",
               borderRadius: "20px",
               padding: "8px 30px",
-            }}>
-            Terapkan
+            }}
+            disabled={uploading}>
+            {uploading ? "Menyimpan..." : "Terapkan"}
           </button>
         </div>
       </form>

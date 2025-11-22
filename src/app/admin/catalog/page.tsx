@@ -5,17 +5,11 @@ import React, { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import ProductModal from "@/src/app/components/admin/ProductModal";
 import DeleteModal from "@/src/app/components/admin/DeleteModal";
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  sold?: number;
-  image: string | null;
-  description: string;
-  link: string;
-}
+import {
+  ProductsAPI,
+  Product,
+  ProductCreateData,
+} from "@/src/lib/api/products";
 
 interface ProductModalData {
   name: string;
@@ -25,9 +19,6 @@ interface ProductModalData {
   description: string;
   image?: string | null;
 }
-
-// Backend API Base URL
-const API_BASE_URL = "http://localhost:5000/api";
 
 export default function AdminCatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -53,14 +44,13 @@ export default function AdminCatalogPage() {
       setError(null);
       console.log("Fetching products...");
 
-      const response = await fetch(`${API_BASE_URL}/products`);
-      const result = await response.json();
+      const result = await ProductsAPI.getAll();
 
       console.log("Fetch result:", result);
 
       if (result.success) {
         setProducts(result.data || []);
-        console.log(`✅ ${result.data.length} products loaded`);
+        console.log(`✅ ${result.data?.length || 0} products loaded`);
       } else {
         throw new Error(result.message || "Failed to fetch products");
       }
@@ -115,7 +105,7 @@ export default function AdminCatalogPage() {
       console.log("Current product:", currentProduct);
 
       // Prepare payload
-      const payload = {
+      const payload: ProductCreateData = {
         name: data.name.trim(),
         price:
           typeof data.price === "number"
@@ -133,19 +123,11 @@ export default function AdminCatalogPage() {
         // ===== UPDATE PRODUCT =====
         console.log("Updating product with id:", currentProduct.id);
 
-        const response = await fetch(`/api/products/${currentProduct.id}`, {
-          method: "PATCH", // Menggunakan PATCH sesuai backend
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+        const result = await ProductsAPI.update(currentProduct.id, payload);
 
-        console.log("Update response status:", response.status);
-        const result = await response.json();
         console.log("Update result:", result);
 
-        if (!response.ok || !result.success) {
+        if (!result.success) {
           if (result.errors && Array.isArray(result.errors)) {
             throw new Error(result.errors.join("\n"));
           }
@@ -154,7 +136,7 @@ export default function AdminCatalogPage() {
 
         // Update local state
         setProducts(
-          products.map((p) => (p.id === currentProduct.id ? result.data : p))
+          products.map((p) => (p.id === currentProduct.id ? result.data! : p))
         );
 
         alert("✅ Produk berhasil diupdate!");
@@ -163,19 +145,11 @@ export default function AdminCatalogPage() {
         // ===== CREATE PRODUCT =====
         console.log("Creating new product...");
 
-        const response = await fetch(`${API_BASE_URL}/products`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+        const result = await ProductsAPI.create(payload);
 
-        console.log("Create response status:", response.status);
-        const result = await response.json();
         console.log("Create result:", result);
 
-        if (!response.ok || !result.success) {
+        if (!result.success) {
           if (result.errors && Array.isArray(result.errors)) {
             throw new Error(result.errors.join("\n"));
           }
@@ -183,7 +157,7 @@ export default function AdminCatalogPage() {
         }
 
         // Add new product to local state
-        setProducts([...products, result.data]);
+        setProducts([...products, result.data!]);
 
         alert("✅ Produk berhasil ditambahkan!");
         console.log("Product created successfully:", result.data);
@@ -212,14 +186,11 @@ export default function AdminCatalogPage() {
     try {
       console.log("Deleting product:", productToDelete.id);
 
-      const response = await fetch(`/api/products/${productToDelete.id}`, {
-        method: "DELETE",
-      });
+      const result = await ProductsAPI.delete(productToDelete.id);
 
-      const result = await response.json();
       console.log("Delete result:", result);
 
-      if (!response.ok || !result.success) {
+      if (!result.success) {
         throw new Error(result.message || "Failed to delete product");
       }
 

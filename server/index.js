@@ -16,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Import routes AFTER app initialization
+const uploadRoutes = require("./routes/UploadRoutes");
 const productRoutes = require("./routes/ProductRoutes");
 
 // Root endpoint with complete API documentation
@@ -187,7 +188,9 @@ app.get("/", (req, res) => {
 // API Routes
 // app.use("/api", dataRoutes);
 app.use("/api", productRoutes);
+// app.use("/api/products", productRoutes);
 app.use("/api/hero", heroRoutes);
+app.use("/api", uploadRoutes);
 
 // 404 Handler
 // Mount API routes
