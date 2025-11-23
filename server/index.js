@@ -28,6 +28,7 @@ const productRoutes = require("./routes/ProductRoutes");
 const heroRoutes = require("./routes/HeroRoutes");
 const privacyPolicyRoutes = require("./routes/PrivacyPolicyRoutes");
 const loginRoutes = require("./routes/LoginRoutes");
+const featuredProductRoutes = require("./routes/FeaturedProductRoutes");
 
 // Root endpoint with complete API documentation
 app.get("/", (req, res) => {
@@ -201,6 +202,7 @@ app.use("/api/hero", heroRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/privacy-policy", privacyPolicyRoutes);
 app.use("/api/admin", loginRoutes);
+app.use("/api", featuredProductRoutes);
 
 // 404 Handler
 // Error handling middleware

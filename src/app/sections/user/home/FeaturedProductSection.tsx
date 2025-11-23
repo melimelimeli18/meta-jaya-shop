@@ -1,52 +1,88 @@
+// src/app/sections/user/home/FeaturedProductSection.tsx
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
-import {
-  DriverSpeakerN850,
-  ComponentRCFLF08HF150,
-  TweeterSpeakerRCFN850,
-} from "@/src/assets/images";
 import OutlineButton from "@/src/app/components/shared/OutlineButton";
 
+interface FeaturedProduct {
+  id: string;
+  title: string;
+  image: string;
+  specs: string[];
+  price: string;
+  link: string;
+}
+
 function FeaturedProductSection() {
-  const products = [
-    {
-      id: 1,
-      title: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-      image: DriverSpeakerN850,
-      specs: [
-        "Power Handling: 500W AES / 850W program",
-        "Frequency Range: 500Hz - 20kHz",
-        "Sensitivity: 109 dB",
-        "Diaphragm: Pure Titanium, 3-inch",
-      ],
-    },
-    {
-      id: 2,
-      title: "Speaker Component RCF LF08HF150",
-      image: ComponentRCFLF08HF150,
-      specs: [
-        "Diameter: 8 inch",
-        "Power Output: 100 Watt",
-        "Frequency Range: 105Hz - 4.4kHz",
-        "Sensitivity: 93 dB",
-      ],
-    },
-    {
-      id: 3,
-      title: "Tweeter Speaker RCF N850",
-      image: TweeterSpeakerRCFN850,
-      specs: [
-        "Power Max: 750 Watt",
-        "Voice Coil (Spull): 3 inch",
-        "Impedance: 8Ω",
-        "Magnet: Besar, daya dorong kuat",
-      ],
-    },
-  ];
+  const [products, setProducts] = useState<FeaturedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, []);
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/products");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      let productsData = [];
+      if (Array.isArray(result)) {
+        productsData = result;
+      } else if (result.data && Array.isArray(result.data)) {
+        productsData = result.data;
+      } else if (result.success && result.data) {
+        productsData = result.data;
+      }
+
+      const featuredProducts = productsData
+        .filter((product: any) => product.is_featured || product.isFeatured)
+        .slice(0, 3)
+        .map((product: any) => {
+          // Truncate description to max 150 characters
+          let truncatedDescription = product.description || "";
+          if (truncatedDescription.length > 150) {
+            truncatedDescription =
+              truncatedDescription.substring(0, 150) + "...";
+          }
+
+          return {
+            id: product.id,
+            title: product.name,
+            image: product.image || "/placeholder-product.jpg",
+            specs: truncatedDescription
+              ? truncatedDescription
+                  .split("\n")
+                  .filter((spec: string) => spec.trim() !== "")
+              : [],
+            price:
+              typeof product.price === "number"
+                ? `Rp${product.price.toLocaleString("id-ID")}`
+                : product.price,
+            link: product.link || `/products/${product.id}`,
+          };
+        });
+
+      setProducts(featuredProducts);
+    } catch (error) {
+      console.error("Error fetching featured products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!loading && products.length === 0) {
+    return null;
+  }
 
   return (
     <div
@@ -60,41 +96,52 @@ function FeaturedProductSection() {
           Produk <span style={{ color: "#000" }}>Unggulan</span>
         </h2>
 
-        <div className="d-flex flex-wrap justify-content-center gap-4 gap-lg-5">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="product-card d-flex flex-column justify-content-between">
-              {/* Gambar Produk */}
-              <div className="image-wrapper">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  width={380}
-                  height={250}
-                  className="product-image"
-                />
-              </div>
-
-              {/* Konten Produk */}
-              <div className="product-content d-flex flex-column justify-content-between flex-grow-1">
-                <div>
-                  <h5 className="product-title">{product.title}</h5>
-                  <div className="product-desc">
-                    {product.specs.map((spec, index) => (
-                      <p key={index} className="mb-1">
-                        {spec}
-                      </p>
-                    ))}
-                  </div>
+        {loading ? (
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "300px" }}>
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : (
+          <div className="d-flex flex-wrap justify-content-center gap-4 gap-lg-5">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="product-card d-flex flex-column justify-content-between">
+                {/* Gambar Produk - Using img tag instead of Next Image */}
+                <div className="image-wrapper">
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="product-image"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/placeholder-product.jpg";
+                    }}
+                  />
                 </div>
 
-                {/* Nanti bakal diarahkan ke halaman masing-masing halaman, sesuai dengan ID yang ditembak dengan halaman */}
-                <OutlineButton label="Lihat Detail" href="" />
+                {/* Konten Produk */}
+                <div className="product-content d-flex flex-column justify-content-between flex-grow-1">
+                  <div>
+                    <h5 className="product-title">{product.title}</h5>
+                    <div className="product-desc">
+                      {product.specs.map((spec, index) => (
+                        <p key={index} className="mb-1">
+                          {spec}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  <OutlineButton label="Lihat Detail" href={product.link} />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Container>
 
       <style jsx>{`
