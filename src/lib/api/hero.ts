@@ -1,5 +1,5 @@
 // lib/api/hero.ts
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
 
 export interface HeroData {
   id?: string;
@@ -13,14 +13,14 @@ export const heroAPI = {
   // GET - Ambil data hero
   async getHero(): Promise<HeroData> {
     const response = await fetch(`${API_BASE_URL}/hero`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch hero data');
+      throw new Error("Failed to fetch hero data");
     }
 
     const result = await response.json();
@@ -34,15 +34,15 @@ export const heroAPI = {
     banner_image_url?: string;
   }): Promise<HeroData> {
     const response = await fetch(`${API_BASE_URL}/hero`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to update hero data');
+      throw new Error("Failed to update hero data");
     }
 
     const result = await response.json();
@@ -52,15 +52,15 @@ export const heroAPI = {
   // POST - Upload banner image
   async uploadBanner(file: File): Promise<{ url: string; hero: HeroData }> {
     const formData = new FormData();
-    formData.append('banner', file);
+    formData.append("banner", file);
 
     const response = await fetch(`${API_BASE_URL}/hero/upload-banner`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
 
     if (!response.ok) {
-      throw new Error('Failed to upload banner');
+      throw new Error("Failed to upload banner");
     }
 
     const result = await response.json();

@@ -1,6 +1,7 @@
 // src/app/components/admin/ProductModal.tsx
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Modal from "./Modal";
 
 interface Product {
@@ -123,7 +124,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
         console.log("Uploading image:", formData.file.name);
 
         const uploadResponse = await fetch(
-          "http://localhost:5000/api/upload-image",
+          process.env.NEXT_PUBLIC_UPLOAD_IMAGE_API,
           {
             method: "POST",
             body: formDataToSend,
@@ -219,13 +220,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
               )}
 
               {preview && (
-                <img
+                <Image
                   src={preview}
                   alt="Preview"
+                  width={120}
+                  height={120}
                   className="mt-2"
                   style={{
-                    width: "120px",
-                    height: "120px",
                     objectFit: "cover",
                     borderRadius: "10px",
                     border: "2px solid #ddd",

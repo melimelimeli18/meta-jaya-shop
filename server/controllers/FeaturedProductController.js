@@ -10,6 +10,9 @@ const FeaturedProductController = {
       console.log("========== BATCH UPDATE FEATURED ==========");
       console.log("Products to update:", products);
 
+      console.log("Request body:", req.body);
+      console.log("Request headers:", req.headers);
+
       if (!products || !Array.isArray(products)) {
         return res.status(400).json({
           success: false,
