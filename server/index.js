@@ -1,8 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const dataRoutes = require("./routes/ProductRoutes");
-const heroRoutes = require("./routes/HeroRoutes");
 const { getHero } = require("./controllers/HeroController");
 
 // Load environment variables
@@ -27,7 +25,9 @@ app.use((req, res, next) => {
 // Import routes AFTER app initialization
 const uploadRoutes = require("./routes/UploadRoutes");
 const productRoutes = require("./routes/ProductRoutes");
+const heroRoutes = require("./routes/HeroRoutes");
 const privacyPolicyRoutes = require("./routes/PrivacyPolicyRoutes");
+const loginRoutes = require("./routes/LoginRoutes");
 
 // Root endpoint with complete API documentation
 app.get("/", (req, res) => {
@@ -196,15 +196,13 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-// app.use("/api", dataRoutes);
 app.use("/api", productRoutes);
 app.use("/api/hero", heroRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/privacy-policy", privacyPolicyRoutes);
+app.use("/api/admin", loginRoutes);
 
 // 404 Handler
-// Mount API routes
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Error:", err.stack);

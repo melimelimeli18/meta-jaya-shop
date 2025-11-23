@@ -1,7 +1,7 @@
 // src/app/api/products/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const EXPRESS_API_URL = "http://localhost:5000/api";
+const EXPRESS_API_URL = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
 
 /**
  * GET /api/products/:id → Get ONE product
