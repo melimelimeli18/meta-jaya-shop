@@ -7,7 +7,7 @@ import {
   PanggungIllustration,
   MusicIllustration,
   PortableSpeakerIllustration,
-} from "@/client/assets/images";
+} from "@/src/assets/images";
 
 function UsedProductSection() {
   return (

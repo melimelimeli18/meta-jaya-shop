@@ -7,7 +7,7 @@ import {
   PinkPriceTagIcon,
   PinkSettingIcon,
   PinkPeopleIcon,
-} from "@/client/assets/icons";
+} from "@/src/assets/icons";
 
 function AboutSection() {
   return (

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import Image from "next/image";
-import { HeroBackground } from "@/client/assets/images";
+import { HeroBackground } from "@/src/assets/images";
 import { heroAPI, HeroData } from "@/src/lib/api/hero";
 
 function HeroSection() {
@@ -18,12 +18,13 @@ function HeroSection() {
         const data = await heroAPI.getHero();
         setHeroData(data);
       } catch (error) {
-        console.error('Error fetching hero:', error);
+        console.error("Error fetching hero:", error);
         // Fallback ke data default jika error
         setHeroData({
           headline: "Peralatan Audio Berkualitas untuk Setiap Kebutuhan",
-          sub_headline: "Kami menyediakan berbagai solusi audio profesional, dari speaker, mikrofon, hingga sistem suara untuk berbagai acara dan kebutuhan.",
-          banner_image_url: null
+          sub_headline:
+            "Kami menyediakan berbagai solusi audio profesional, dari speaker, mikrofon, hingga sistem suara untuk berbagai acara dan kebutuhan.",
+          banner_image_url: null,
         });
       } finally {
         setLoading(false);
@@ -37,8 +38,7 @@ function HeroSection() {
     return (
       <div
         className="d-flex align-items-center justify-content-center"
-        style={{ minHeight: "100vh" }}
-      >
+        style={{ minHeight: "100vh" }}>
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -48,7 +48,8 @@ function HeroSection() {
 
   // Gunakan banner dari backend jika ada, kalau tidak pakai default
   const backgroundImage = heroData?.banner_image_url || HeroBackground;
-  const isExternalImage = typeof backgroundImage === 'string' && backgroundImage.startsWith('http');
+  const isExternalImage =
+    typeof backgroundImage === "string" && backgroundImage.startsWith("http");
 
   return (
     <div
@@ -92,10 +93,12 @@ function HeroSection() {
       {/* Content */}
       <Container>
         <h1 className="fw-bold hero-title text-white">
-          {heroData?.headline || "Peralatan Audio Berkualitas untuk Setiap Kebutuhan"}
+          {heroData?.headline ||
+            "Peralatan Audio Berkualitas untuk Setiap Kebutuhan"}
         </h1>
         <p className="hero-subtitle mt-3 mx-auto text-white">
-          {heroData?.sub_headline || "Kami menyediakan berbagai solusi audio profesional, dari speaker, mikrofon, hingga sistem suara untuk berbagai acara dan kebutuhan."}
+          {heroData?.sub_headline ||
+            "Kami menyediakan berbagai solusi audio profesional, dari speaker, mikrofon, hingga sistem suara untuk berbagai acara dan kebutuhan."}
         </p>
       </Container>
 

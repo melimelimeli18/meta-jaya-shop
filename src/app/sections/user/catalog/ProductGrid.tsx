@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Image from "next/image";
-import { DriverSpeakerN850 } from "@/client/assets/images";
+import { DriverSpeakerN850 } from "@/src/assets/images";
 import { Container, Row, Col } from "react-bootstrap";
 import { OutlineButton } from "@/src/app/components/shared";
 import SearchBar from "@/src/app/components/shared/Searchbar";

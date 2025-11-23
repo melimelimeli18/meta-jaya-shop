@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "react-bootstrap";
-import { UserIcon, StarIcon } from "@/client/assets/icons";
+import { UserIcon, StarIcon } from "@/src/assets/icons";
 
 function TestimonialSection() {
   const testimonials = [
