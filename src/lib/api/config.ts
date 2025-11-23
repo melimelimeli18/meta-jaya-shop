@@ -7,8 +7,7 @@
 
 export const API_CONFIG = {
   // Express Backend API Base URL
-  EXPRESS_API_URL:
-    process.env.NEXT_PUBLIC_EXPRESS_API_URL || "http://localhost:5000/api",
+  EXPRESS_API_URL: process.env.NEXT_PUBLIC_EXPRESS_API_URL,
 
   // Next.js API Routes Base URL
   NEXT_API_URL: process.env.NEXT_PUBLIC_API_URL || "/api",

@@ -229,7 +229,8 @@ app.use((req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
+const BASE_URL = process.env.EXPRESS_API_URL;
 
 app.listen(PORT, () => {
   console.log(`
@@ -238,17 +239,11 @@ app.listen(PORT, () => {
   ║   🚀 Products API Server is Running!          ║
   ║                                               ║
   ║   📍 Port: ${PORT}                            ║
-  ║   🌐 Base URL: http://localhost:${PORT}       ║
-  ║   📚 API Docs: http://localhost:${PORT}/api   ║
+  ║   🌐 Base URL: ${BASE_URL}                    ║
   ║   ⏰ Started: ${new Date().toLocaleString()}  ║
   ║                                                ║
   ╚════════════════════════════════════════════════╝
   `);
-
-  console.log("✅ Ready to accept requests!\n");
-  console.log("Quick Test:");
-  console.log(`   GET  http://localhost:${PORT}/api/products`);
-  console.log(`   GET  http://localhost:${PORT}/api/categories\n`);
 });
 
 module.exports = app;

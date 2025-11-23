@@ -30,6 +30,13 @@ interface ApiResponse {
   data: Product[];
 }
 
+interface FavoriteProduct {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+}
+
 const ProductDetailPage = () => {
   const params = useParams();
   const productId = params.id as string;
@@ -56,6 +63,7 @@ const ProductDetailPage = () => {
 
           if (foundProduct) {
             setProduct(foundProduct);
+            checkIfFavorite(foundProduct.id);
           } else {
             throw new Error("Product not found");
           }
@@ -75,6 +83,18 @@ const ProductDetailPage = () => {
     }
   }, [productId]);
 
+  const checkIfFavorite = (id: string) => {
+    try {
+      const stored = localStorage.getItem("metajaya_favorites");
+      if (stored) {
+        const favorites: FavoriteProduct[] = JSON.parse(stored);
+        setIsFavorite(favorites.some((item) => item.id === id));
+      }
+    } catch (error) {
+      console.error("Error checking favorites:", error);
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -84,7 +104,36 @@ const ProductDetailPage = () => {
   };
 
   const handleFavoriteToggle = () => {
-    setIsFavorite(!isFavorite);
+    if (!product) return;
+
+    try {
+      const stored = localStorage.getItem("metajaya_favorites");
+      let favorites: FavoriteProduct[] = stored ? JSON.parse(stored) : [];
+
+      const favoriteData: FavoriteProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      };
+
+      if (isFavorite) {
+        // Remove from favorites
+        favorites = favorites.filter((item) => item.id !== product.id);
+        setIsFavorite(false);
+      } else {
+        // Add to favorites
+        favorites.push(favoriteData);
+        setIsFavorite(true);
+      }
+
+      localStorage.setItem("metajaya_favorites", JSON.stringify(favorites));
+
+      // Dispatch custom event untuk update navbar
+      window.dispatchEvent(new Event("favoritesUpdated"));
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
   };
 
   const handleBelanja = () => {
@@ -203,7 +252,7 @@ const ProductDetailPage = () => {
               }`}
               onClick={handleFavoriteToggle}>
               <Image src={HeartIcon} alt="Favorit" width={24} height={24} />
-              Favorit
+              {isFavorite ? "Hapus Favorit" : "Favorit"}
             </button>
           </div>
         </div>

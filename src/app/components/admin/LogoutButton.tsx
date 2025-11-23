@@ -20,8 +20,7 @@ export default function LogoutButton({
 
       // Optional: Call logout API
       if (token) {
-        const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const API_URL = process.env.NEXT_PUBLIC_API_URL;
         await fetch(`${API_URL}/api/admin/logout`, {
           method: "POST",
           headers: {
