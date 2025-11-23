@@ -10,14 +10,24 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
+// CORS
 app.use(cors());
+
+// Body Parsers (READ req.body)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Log Middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  console.log("Body:", req.body);
+  next();
+});
 
 // Import routes AFTER app initialization
 const uploadRoutes = require("./routes/UploadRoutes");
 const productRoutes = require("./routes/ProductRoutes");
+const privacyPolicyRoutes = require("./routes/PrivacyPolicyRoutes");
 
 // Root endpoint with complete API documentation
 app.get("/", (req, res) => {
@@ -188,9 +198,9 @@ app.get("/", (req, res) => {
 // API Routes
 // app.use("/api", dataRoutes);
 app.use("/api", productRoutes);
-// app.use("/api/products", productRoutes);
 app.use("/api/hero", heroRoutes);
 app.use("/api", uploadRoutes);
+app.use("/api/privacy-policy", privacyPolicyRoutes);
 
 // 404 Handler
 // Mount API routes
@@ -226,11 +236,11 @@ app.listen(PORT, () => {
   ╔════════════════════════════════════════════════╗
   ║                                                ║
   ║   🚀 Products API Server is Running!          ║
-  ║                                                ║
-  ║   📍 Port: ${PORT}                                  ║
-  ║   🌐 Base URL: http://localhost:${PORT}           ║
-  ║   📚 API Docs: http://localhost:${PORT}/api       ║
-  ║   ⏰ Started: ${new Date().toLocaleString()}   ║
+  ║                                               ║
+  ║   📍 Port: ${PORT}                            ║
+  ║   🌐 Base URL: http://localhost:${PORT}       ║
+  ║   📚 API Docs: http://localhost:${PORT}/api   ║
+  ║   ⏰ Started: ${new Date().toLocaleString()}  ║
   ║                                                ║
   ╚════════════════════════════════════════════════╝
   `);

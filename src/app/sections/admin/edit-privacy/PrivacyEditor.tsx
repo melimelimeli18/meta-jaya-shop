@@ -1,54 +1,100 @@
-'use client';
+// File: src/app/sections/admin/edit-privacy/PrivacyEditor.tsx
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Spinner } from "react-bootstrap";
 
 interface PrivacyEditorProps {
-  initialContent?: string;
-  onSubmit: (content: string) => void;
+  initialContent: string;
+  onSubmit: (content: string) => void | Promise<void>;
+  isLoading?: boolean;
+  buttonText?: string;
 }
 
-const PrivacyEditor: React.FC<PrivacyEditorProps> = ({ initialContent = '', onSubmit }) => {
-  const [content, setContent] = useState(initialContent);
+const PrivacyEditor: React.FC<PrivacyEditorProps> = ({
+  initialContent,
+  onSubmit,
+  isLoading = false,
+  buttonText = "Simpan Kebijakan Privasi",
+}) => {
+  const [content, setContent] = useState(initialContent || "");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Update content when initialContent changes
+  useEffect(() => {
+    setContent(initialContent || "");
+  }, [initialContent]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(content);
+    if (onSubmit && typeof onSubmit === "function") {
+      await onSubmit(content);
+    } else {
+      console.error("onSubmit is not a function:", onSubmit);
+    }
+  };
+
+  const handleReset = () => {
+    setContent(initialContent);
   };
 
   return (
     <div className="bg-white rounded-4 shadow-sm p-4">
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="form-label fw-semibold">Kebijakan Privasi</label>
-          <textarea
-            name="privacy"
-            className="form-control"
-            placeholder="Deskripsi Produk"
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-4">
+          <Form.Label className="fw-semibold">
+            Konten Kebijakan Privasi
+          </Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={15}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows={15}
-            required
-            style={{ 
-              borderColor: "#468386", 
-              borderRadius: "20px",
-              resize: "vertical"
+            placeholder="Masukkan konten kebijakan privasi di sini..."
+            className="font-monospace"
+            style={{
+              fontSize: "0.9rem",
+              lineHeight: "1.6",
             }}
+            disabled={isLoading}
+            required
           />
-        </div>
+          <Form.Text className="text-muted">
+            Format teks akan dipertahankan seperti yang Anda ketik.
+          </Form.Text>
+        </Form.Group>
 
-        <button
-          type="submit"
-          className="btn"
-          style={{
-            backgroundColor: "#468386",
-            color: "white",
-            borderRadius: "20px",
-            padding: "10px 30px",
-          }}
-        >
-          Simpan
-        </button>
-      </form>
+        <div className="d-flex gap-2">
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={isLoading || !content || !content.trim()}
+            className="px-4">
+            {isLoading ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                Menyimpan...
+              </>
+            ) : (
+              buttonText
+            )}
+          </Button>
+
+          <Button
+            variant="outline-secondary"
+            type="button"
+            onClick={handleReset}
+            disabled={isLoading || content === initialContent}>
+            Reset
+          </Button>
+        </div>
+      </Form>
     </div>
   );
 };
