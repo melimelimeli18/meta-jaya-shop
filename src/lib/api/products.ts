@@ -38,7 +38,7 @@ export class ProductsAPI {
    * Get all products
    */
   static async getAll(): Promise<ApiResponse<Product[]>> {
-    const response = await fetch(getApiUrl("/products"));
+    const response = await fetch(getApiUrl("/api/products"));
     return response.json();
   }
 
