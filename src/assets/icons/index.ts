@@ -8,3 +8,6 @@ export { default as PinkThumbsUpIcon } from "./ui/pink-circle-thumbs-up.svg";
 // Testimonial
 export { default as UserIcon } from "./ui/user.svg";
 export { default as StarIcon } from "./ui/star.svg";
+
+// Product
+export { default as HeartIcon } from "./ui/heart-outline.svg";

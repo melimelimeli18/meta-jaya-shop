@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Image from "next/image";
 import { DriverSpeakerN850 } from "@/src/assets/images";
@@ -13,86 +13,66 @@ import styles from "./ProductGrid.module.css";
 // Types
 interface Product {
   id: string;
-  title: string;
-  price: string;
+  name: string;
+  price: number;
   category: string;
-  image: any;
+  image: string;
+  description: string;
+  link: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  count: number;
+  data: Product[];
 }
 
 const ProductGridSection = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<string>("Semua");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Product data
-  const products: Product[] = [
-    {
-      id: "PRD001",
-      title: "Tweeter / Driver Speaker RCF N850 Magnet Besar",
-      price: "Rp350.000",
-      category: "Speaker Component",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD002",
-      title: "Stand Microphone Premium Quality",
-      price: "Rp150.000",
-      category: "Stand",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD003",
-      title: "Power Amplifier 1000W Professional",
-      price: "Rp2.500.000",
-      category: "Power Amplifier",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD004",
-      title: "Wireless Microphone System",
-      price: "Rp850.000",
-      category: "Microphone",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD005",
-      title: "Portable Bluetooth Speaker",
-      price: "Rp450.000",
-      category: "Portable Speaker",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD006",
-      title: "Audio Mixer 8 Channel",
-      price: "Rp1.200.000",
-      category: "Mixer Audio",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD007",
-      title: "Kit Power Modul Speaker 400W",
-      price: "Rp320.000",
-      category: "Kit Power/ Modul Speaker",
-      image: DriverSpeakerN850,
-    },
-    {
-      id: "PRD008",
-      title: "Dynamic Vocal Microphone",
-      price: "Rp280.000",
-      category: "Microphone",
-      image: DriverSpeakerN850,
-    },
-  ];
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(process.env.NEXT_PUBLIC_PRODUCT_GET_API!);
 
-  const categories = [
-    "Stand",
-    "Microphone",
-    "Power Amplifier",
-    "Kit Power/ Modul Speaker",
-    "Portable Speaker",
-    "Speaker Component",
-    "Mixer Audio",
-  ];
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const result: ApiResponse = await response.json();
+
+        if (result.success && result.data) {
+          setProducts(result.data);
+        } else {
+          throw new Error("Invalid API response");
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Get unique categories from products
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(
+      new Set(products.map((p) => p.category))
+    ).sort();
+    return uniqueCategories;
+  }, [products]);
 
   // Count products per category
   const getProductCount = (category: string) => {
@@ -101,21 +81,23 @@ const ProductGridSection = () => {
   };
 
   // Prepare filter options
-  const filterOptions: FilterOption[] = [
-    { label: "Semua", value: "Semua", count: products.length },
-    ...categories.map((cat) => ({
-      label: cat,
-      value: cat,
-      count: getProductCount(cat),
-    })),
-  ];
+  const filterOptions: FilterOption[] = useMemo(() => {
+    return [
+      { label: "Semua", value: "Semua", count: products.length },
+      ...categories.map((cat) => ({
+        label: cat,
+        value: cat,
+        count: getProductCount(cat),
+      })),
+    ];
+  }, [categories, products]);
 
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch =
         searchQuery === "" ||
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesCategory =
@@ -137,6 +119,45 @@ const ProductGridSection = () => {
     setSearchQuery("");
     setSelectedFilter("Semua");
   };
+
+  // Format price to IDR
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  if (loading) {
+    return (
+      <Container fluid className="py-4 px-3 px-md-5">
+        <div className={styles.emptyState}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className={styles.emptyText}>Memuat produk...</p>
+        </div>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container fluid className="py-4 px-3 px-md-5">
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>⚠️</div>
+          <h5 className={styles.emptyTitle}>Gagal memuat produk</h5>
+          <p className={styles.emptyText}>{error}</p>
+          <button
+            className="btn btn-primary"
+            onClick={() => window.location.reload()}>
+            Coba Lagi
+          </button>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4 px-3 px-md-5">
@@ -184,11 +205,11 @@ const ProductGridSection = () => {
                     <div className={styles.productImageWrapper}>
                       <Image
                         src={product.image}
-                        alt={product.title}
+                        alt={product.name}
                         width={277}
                         height={180}
                         className={styles.productImage}
-                        priority={product.id === "PRD001"}
+                        unoptimized
                       />
                     </div>
 
@@ -198,9 +219,11 @@ const ProductGridSection = () => {
                           {product.category}
                         </span>
                         <h5 className={styles.productCardTitle}>
-                          {product.title}
+                          {product.name}
                         </h5>
-                        <p className={styles.productPrice}>{product.price}</p>
+                        <p className={styles.productPrice}>
+                          {formatPrice(product.price)}
+                        </p>
                       </div>
                       <OutlineButton
                         label="Lihat Detail"
