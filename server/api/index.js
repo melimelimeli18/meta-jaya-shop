@@ -1,10 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const { getHero } = require("./controllers/HeroController");
-
-// Load environment variables
-dotenv.config();
+const { getHero } = require("../controllers/HeroController");
 
 const app = express();
 
@@ -23,12 +20,12 @@ app.use((req, res, next) => {
 });
 
 // Import routes AFTER app initialization
-const uploadRoutes = require("./routes/UploadRoutes");
-const productRoutes = require("./routes/ProductRoutes");
-const heroRoutes = require("./routes/HeroRoutes");
-const privacyPolicyRoutes = require("./routes/PrivacyPolicyRoutes");
-const loginRoutes = require("./routes/LoginRoutes");
-const featuredProductRoutes = require("./routes/FeaturedProductRoutes");
+const uploadRoutes = require("../routes/UploadRoutes");
+const productRoutes = require("../routes/ProductRoutes");
+const heroRoutes = require("../routes/HeroRoutes");
+const privacyPolicyRoutes = require("../routes/PrivacyPolicyRoutes");
+const loginRoutes = require("../routes/LoginRoutes");
+const featuredProductRoutes = require("../routes/FeaturedProductRoutes");
 
 // Root endpoint with complete API documentation
 app.get("/", (req, res) => {

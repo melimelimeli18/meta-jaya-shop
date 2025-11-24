@@ -3,7 +3,6 @@
 
 const { supabase } = require("../config/supabase");
 const bcrypt = require("bcrypt");
-dotenv.config();
 
 async function createFirstAdmin() {
   try {
