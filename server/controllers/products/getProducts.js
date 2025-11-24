@@ -1,4 +1,7 @@
 const supabase = require("../../config/supabase");
+// const { supabase, initSupabase } = require("../config/supabase");
+
+// await initSupabase();
 
 /**
  * GET all products with optional sorting

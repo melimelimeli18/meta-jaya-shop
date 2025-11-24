@@ -1,5 +1,8 @@
 const supabase = require("../../config/supabase");
+// const { supabase, initSupabase } = require("../config/supabase");
 const { supabaseAdmin } = require("../../config/supabase");
+
+// await initSupabase();
 
 /**
  * Helper function to delete image from storage

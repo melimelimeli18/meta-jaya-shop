@@ -1,7 +1,9 @@
 // server/controllers/upload/uploadImage.js
 const { supabaseAdmin } = require("../../config/supabase"); // Gunakan admin client untuk bypass RLS
 const multer = require("multer");
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+// const uuidv4 = require("uuid").v4;
+const { uuidv4 } = require("crypto");
 const path = require("path");
 
 // Configure multer for memory storage
