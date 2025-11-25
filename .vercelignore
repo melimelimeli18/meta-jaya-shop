@@ -1,4 +1,6 @@
 # .vercelignore
+.next
+node_modules
 
 # Backend folder
 server/
