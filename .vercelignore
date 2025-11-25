@@ -1,0 +1,32 @@
+# .vercelignore
+
+# Backend folder
+server/
+server/**
+
+# Environment files (use Vercel Dashboard instead)
+.env
+.env.local
+.env.production
+.env.development
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore

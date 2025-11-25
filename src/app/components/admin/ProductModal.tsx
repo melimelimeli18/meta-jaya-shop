@@ -118,18 +118,21 @@ const ProductModal: React.FC<ProductModalProps> = ({
 
       // Upload image if file is selected
       if (formData.file) {
+        const uploadApiUrl = process.env.NEXT_PUBLIC_UPLOAD_IMAGE_API;
+
+        if (!uploadApiUrl) {
+          throw new Error("Upload API URL is not configured");
+        }
+
         const formDataToSend = new FormData();
-        formDataToSend.append("image", formData.file); // Pastikan field name adalah "image"
+        formDataToSend.append("image", formData.file);
 
         console.log("Uploading image:", formData.file.name);
 
-        const uploadResponse = await fetch(
-          process.env.NEXT_PUBLIC_UPLOAD_IMAGE_API,
-          {
-            method: "POST",
-            body: formDataToSend,
-          }
-        );
+        const uploadResponse = await fetch(uploadApiUrl, {
+          method: "POST",
+          body: formDataToSend,
+        });
 
         if (!uploadResponse.ok) {
           const errorData = await uploadResponse.json();

@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 import { HeartIcon } from "@/src/assets/icons";
 import styles from "./ProductDetail.module.css";
 

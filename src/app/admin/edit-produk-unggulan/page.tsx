@@ -1,20 +1,9 @@
-// src/app/admin/edit-produk-unggulan/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import FeaturedProductList from "@/src/app/sections/admin/edit-produk-unggulan/FeaturedProductList";
-
-interface Product {
-  id: string;
-  name: string;
-  price: string;
-  isFeatured: boolean;
-  category?: string;
-  image?: string;
-  description?: string;
-  link?: string;
-}
+import type { Product } from "@/src/types/product"; // Import shared type
 
 const MAX_FEATURED = 3;
 
@@ -61,8 +50,8 @@ export default function EditProdukUnggulanPage() {
         productsData = result.data;
       }
 
-      const formattedProducts = productsData.map((product: any) => ({
-        id: product.id,
+      const formattedProducts: Product[] = productsData.map((product: any) => ({
+        id: String(product.id), // Ensure string
         name: product.name,
         price:
           typeof product.price === "number"
@@ -77,10 +66,8 @@ export default function EditProdukUnggulanPage() {
 
       setProducts(formattedProducts);
 
-      const currentFeatured = new Set(
-        formattedProducts
-          .filter((p: Product) => p.isFeatured)
-          .map((p: Product) => p.id)
+      const currentFeatured = new Set<string>(
+        formattedProducts.filter((p) => p.isFeatured).map((p) => p.id)
       );
       setSelectedProducts(currentFeatured);
     } catch (err) {
@@ -171,7 +158,8 @@ export default function EditProdukUnggulanPage() {
 
     if (currentFeatured.size !== selectedProducts.size) return true;
 
-    for (const id of selectedProducts) {
+    const selectedArray = Array.from(selectedProducts);
+    for (const id of selectedArray) {
       if (!currentFeatured.has(id)) return true;
     }
 
@@ -271,8 +259,14 @@ export default function EditProdukUnggulanPage() {
 
           <FeaturedProductList
             products={filteredProducts.map((p) => ({
-              ...p,
+              id: p.id,
+              name: p.name,
+              price: p.price,
               isFeatured: selectedProducts.has(p.id),
+              category: p.category,
+              image: p.image,
+              description: p.description,
+              link: p.link,
             }))}
             onToggleFeatured={handleToggleSelection}
           />

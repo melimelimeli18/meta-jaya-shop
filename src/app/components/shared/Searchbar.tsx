@@ -4,7 +4,7 @@
 import React from "react";
 import { Form } from "react-bootstrap";
 import { FiSearch, FiFilter } from "react-icons/fi";
-import styles from "./SearchBar.module.css";
+import styles from "./Searchbar.module.css";
 
 interface SearchBarProps {
   value: string;

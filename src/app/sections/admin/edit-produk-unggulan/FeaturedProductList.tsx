@@ -1,56 +1,55 @@
-'use client';
-
-import React from 'react';
-
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  isFeatured: boolean;
-}
+import React from "react";
+import type { Product } from "@/src/types/product"; // Import shared type
 
 interface FeaturedProductListProps {
   products: Product[];
-  onToggleFeatured: (id: number) => void;
+  onToggleFeatured: (id: string) => void; // Change from number to string
 }
 
-const FeaturedProductList: React.FC<FeaturedProductListProps> = ({ 
-  products, 
-  onToggleFeatured 
-}) => {
+export default function FeaturedProductList({
+  products,
+  onToggleFeatured,
+}: FeaturedProductListProps) {
   return (
-    <div className="bg-white rounded-4 shadow-sm p-4">
-      <div className="d-flex flex-column gap-3">
-        {products.map((product) => (
-          <div 
+    <div className="list-group">
+      {products.length === 0 ? (
+        <div className="text-center py-5 text-muted">
+          <p>Tidak ada produk ditemukan</p>
+        </div>
+      ) : (
+        products.map((product) => (
+          <div
             key={product.id}
-            className="d-flex justify-content-between align-items-center p-3 bg-light rounded-3"
-          >
-            <div>
-              <h6 className="mb-1 fw-semibold">{product.name}</h6>
-              <p className="mb-0 text-muted small">{product.price}</p>
-            </div>
-            
-            <div className="form-check">
+            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div className="form-check d-flex align-items-center gap-3">
               <input
                 className="form-check-input"
                 type="checkbox"
-                id={`featured-${product.id}`}
                 checked={product.isFeatured}
                 onChange={() => onToggleFeatured(product.id)}
-                style={{ 
-                  width: "24px", 
-                  height: "24px",
-                  cursor: "pointer",
-                  borderColor: "#468386"
-                }}
+                id={`product-${product.id}`}
               />
+              <label
+                className="form-check-label"
+                htmlFor={`product-${product.id}`}
+                style={{ cursor: "pointer" }}>
+                <div>
+                  <strong>{product.name}</strong>
+                  {product.category && (
+                    <span className="badge bg-secondary ms-2">
+                      {product.category}
+                    </span>
+                  )}
+                  <div className="text-muted small">{product.price}</div>
+                </div>
+              </label>
             </div>
+            {product.isFeatured && (
+              <span className="badge bg-success">⭐ Unggulan</span>
+            )}
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
   );
-};
-
-export default FeaturedProductList;
+}

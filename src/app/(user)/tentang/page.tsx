@@ -81,7 +81,7 @@ export default function Tentang() {
             type="button"
             onClick={() =>
               window.open(
-                "https://shopee.co.id/",
+                "https://id.shp.ee/uecCNYK",
                 "_blank",
                 "noopener noreferrer"
               )

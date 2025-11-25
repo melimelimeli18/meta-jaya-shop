@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   images: {
     remotePatterns: [
       {
@@ -11,6 +12,12 @@ const nextConfig = {
     ],
     // Alternative: use domains (deprecated but still works)
     // domains: ['vxsivwdmvwxpprujdhpi.supabase.co'],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    outputFileTracingRoot: undefined,
   },
 };
 

@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // JWT Secret - simpan di .env
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-this";
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "24h"; // Token berlaku 24 jam
 
 // @desc    Login Admin
