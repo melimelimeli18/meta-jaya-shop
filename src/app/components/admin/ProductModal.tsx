@@ -52,6 +52,16 @@ const ProductModal: React.FC<ProductModalProps> = ({
     return parseInt(numberString, 10) || 0;
   };
 
+  // Convert File to Base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -115,6 +125,15 @@ const ProductModal: React.FC<ProductModalProps> = ({
       const priceNumber = parseRupiah(formData.price);
 
       let imageUrl = initialData?.image || null;
+      let oldImagePath: string | null = null;
+
+      // Extract old image path from URL if updating
+      if (initialData?.image) {
+        const urlParts = initialData.image.split('/product-images/');
+        if (urlParts.length > 1) {
+          oldImagePath = urlParts[1];
+        }
+      }
 
       // Upload image if file is selected
       if (formData.file) {
@@ -124,14 +143,20 @@ const ProductModal: React.FC<ProductModalProps> = ({
           throw new Error("Upload API URL is not configured");
         }
 
-        const formDataToSend = new FormData();
-        formDataToSend.append("image", formData.file);
+        console.log("Converting image to base64...");
+        const base64Image = await fileToBase64(formData.file);
 
         console.log("Uploading image:", formData.file.name);
 
         const uploadResponse = await fetch(uploadApiUrl, {
           method: "POST",
-          body: formDataToSend,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image: base64Image,
+            oldImagePath: oldImagePath,
+          }),
         });
 
         if (!uploadResponse.ok) {
@@ -140,7 +165,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
         }
 
         const uploadResult = await uploadResponse.json();
+        
+        if (!uploadResult.success) {
+          throw new Error(uploadResult.message || "Upload failed");
+        }
+
         imageUrl = uploadResult.data.publicUrl;
+        console.log("Image uploaded successfully:", imageUrl);
       }
 
       const submitData: Product = {

@@ -1,163 +1,102 @@
 // server/controllers/upload/uploadImage.js
-const { supabaseAdmin } = require("../../config/supabase"); // Gunakan admin client untuk bypass RLS
-const multer = require("multer");
-// import { v4 as uuidv4 } from "uuid";
-// const uuidv4 = require("uuid").v4;
-const { uuidv4 } = require("crypto");
-const path = require("path");
-
-// Configure multer for memory storage
-const storage = multer.memoryStorage();
-
-const fileFilter = (req, file, cb) => {
-  // Accept images only
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(
-    path.extname(file.originalname).toLowerCase()
-  );
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed!"));
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: fileFilter,
-}).single("image");
+const { supabaseAdmin } = require("../../config/supabase");
+const { randomUUID } = require("crypto");
 
 /**
- * Upload image to Supabase Storage
+ * Upload image to Supabase Storage (Base64 approach)
  */
-const uploadImage = (req, res) => {
-  // Use multer middleware
-  upload(req, res, async (err) => {
-    try {
-      if (err instanceof multer.MulterError) {
-        console.error("Multer error:", err);
-        return res.status(400).json({
-          success: false,
-          message: "File upload error",
-          error: err.message,
-          code: err.code,
-          field: err.field,
-        });
-      } else if (err) {
-        console.error("Upload error:", err);
-        return res.status(400).json({
-          success: false,
-          message: err.message,
-        });
-      }
+const uploadImage = async (req, res) => {
+  try {
+    const { image, oldImagePath } = req.body;
 
-      if (!req.file) {
-        console.log("No file in request");
-        console.log("Request headers:", req.headers);
-        console.log("Request body:", req.body);
-        console.log("Request files:", req.files);
-        return res.status(400).json({
-          success: false,
-          message: "No file uploaded",
-        });
-      }
-
-      try {
-        console.log("=== UPLOAD IMAGE START ===");
-        console.log("File info:", {
-          originalname: req.file.originalname,
-          mimetype: req.file.mimetype,
-          size: req.file.size,
-        });
-
-        // Check if there's an old image to delete
-        const oldImagePath = req.body.oldImagePath;
-        if (oldImagePath) {
-          console.log("Deleting old image:", oldImagePath);
-          const { error: deleteError } = await supabaseAdmin.storage
-            .from("product-images")
-            .remove([oldImagePath]);
-
-          if (deleteError) {
-            console.error("Error deleting old image:", deleteError);
-            // Continue with upload even if delete fails
-          } else {
-            console.log("Old image deleted successfully");
-          }
-        }
-
-        // Generate unique filename
-        const fileExt = path.extname(req.file.originalname);
-        const fileName = `${uuidv4()}${fileExt}`;
-        const filePath = `products/${fileName}`;
-
-        console.log("Uploading to Supabase Storage:", filePath);
-
-        // Upload to Supabase Storage using admin client (bypass RLS)
-        const { data: uploadData, error: uploadError } =
-          await supabaseAdmin.storage
-            .from("product-images")
-            .upload(filePath, req.file.buffer, {
-              contentType: req.file.mimetype,
-              cacheControl: "3600",
-              upsert: false,
-            });
-
-        if (uploadError) {
-          console.error("Supabase upload error:", uploadError);
-          return res.status(400).json({
-            success: false,
-            message: "Error uploading to storage",
-            error: uploadError.message,
-          });
-        }
-
-        console.log("Upload successful:", uploadData);
-
-        // Get public URL
-        const { data: publicUrlData } = supabaseAdmin.storage
-          .from("product-images")
-          .getPublicUrl(filePath);
-
-        console.log("Public URL:", publicUrlData.publicUrl);
-        console.log("=== UPLOAD IMAGE END ===");
-
-        res.status(200).json({
-          success: true,
-          message: "Image uploaded successfully",
-          data: {
-            fileName: fileName,
-            filePath: filePath,
-            publicUrl: publicUrlData.publicUrl,
-          },
-        });
-      } catch (error) {
-        console.error("=== UPLOAD IMAGE ERROR ===");
-        console.error("Error details:", error);
-        console.error("Error stack:", error.stack);
-
-        res.status(500).json({
-          success: false,
-          message: "Internal server error",
-          error: error.message,
-        });
-      }
-    } catch (outerError) {
-      console.error("=== UPLOAD IMAGE OUTER ERROR ===");
-      console.error("Error details:", outerError);
-
-      res.status(500).json({
+    if (!image) {
+      return res.status(400).json({
         success: false,
-        message: "Internal server error",
-        error: outerError.message,
+        message: "No image data provided",
       });
     }
-  });
+
+    console.log("=== UPLOAD IMAGE START ===");
+
+    // Check if there's an old image to delete
+    if (oldImagePath) {
+      console.log("Deleting old image:", oldImagePath);
+      const { error: deleteError } = await supabaseAdmin.storage
+        .from("product-images")
+        .remove([oldImagePath]);
+
+      if (deleteError) {
+        console.error("Error deleting old image:", deleteError);
+        // Continue with upload even if delete fails
+      } else {
+        console.log("Old image deleted successfully");
+      }
+    }
+
+    // Parse base64 image
+    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+
+    // Get file extension from base64 header
+    const mimeMatch = image.match(/data:image\/(\w+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : "png";
+    const fileExt = `.${mimeType}`;
+
+    // Generate unique filename
+    const fileName = `${randomUUID()}${fileExt}`;
+    const filePath = `products/${fileName}`;
+
+    console.log("Uploading to Supabase Storage:", filePath);
+
+    // Upload to Supabase Storage using admin client (bypass RLS)
+    const { data: uploadData, error: uploadError } =
+      await supabaseAdmin.storage
+        .from("product-images")
+        .upload(filePath, buffer, {
+          contentType: `image/${mimeType}`,
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+    if (uploadError) {
+      console.error("Supabase upload error:", uploadError);
+      return res.status(400).json({
+        success: false,
+        message: "Error uploading to storage",
+        error: uploadError.message,
+      });
+    }
+
+    console.log("Upload successful:", uploadData);
+
+    // Get public URL
+    const { data: publicUrlData } = supabaseAdmin.storage
+      .from("product-images")
+      .getPublicUrl(filePath);
+
+    console.log("Public URL:", publicUrlData.publicUrl);
+    console.log("=== UPLOAD IMAGE END ===");
+
+    res.status(200).json({
+      success: true,
+      message: "Image uploaded successfully",
+      data: {
+        fileName: fileName,
+        filePath: filePath,
+        publicUrl: publicUrlData.publicUrl,
+      },
+    });
+  } catch (error) {
+    console.error("=== UPLOAD IMAGE ERROR ===");
+    console.error("Error details:", error);
+    console.error("Error stack:", error.stack);
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
 };
 
 /**
