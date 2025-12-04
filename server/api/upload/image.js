@@ -1,33 +1,72 @@
-// server/controllers/upload/uploadImage.js
-const { supabaseAdmin } = require("../../config/supabase");
+// api/upload/image.js
+const { supabaseAdmin } = require("../../server/config/supabase");
 
-/**
- * Upload image to Supabase Storage (Base64 approach)
- */
-const uploadImage = async (req, res) => {
+// PENTING: Disable default body parser Vercel
+module.exports.config = {
+  api: {
+    bodyParser: true, // Enable Vercel's body parser
+  },
+};
+
+module.exports = async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle OPTIONS request (preflight)
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Only allow POST method
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      success: false,
+      message: "Method not allowed",
+    });
+  }
+
   try {
-    // Parse body jika belum di-parse (untuk Vercel)
+    console.log("=== DEBUG INFO ===");
+    console.log("Method:", req.method);
+    console.log("Headers:", req.headers);
+    console.log("Body type:", typeof req.body);
+    console.log("Body:", req.body);
+
+    // Parse body jika masih string
     let body = req.body;
 
-    // Jika body masih string, parse dulu
     if (typeof body === "string") {
-      body = JSON.parse(body);
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.error("JSON parse error:", e);
+      }
     }
 
-    // Jika body masih undefined, coba baca dari req
-    if (!body && req.method === "POST") {
+    // Validasi body
+    if (!body || typeof body !== "object") {
       return res.status(400).json({
         success: false,
         message: "Request body is empty or invalid",
+        debug: {
+          bodyType: typeof req.body,
+          bodyValue: req.body,
+          contentType: req.headers["content-type"],
+        },
       });
     }
 
-    const { image, oldImagePath } = body || {};
+    const { image, oldImagePath } = body;
 
     if (!image) {
       return res.status(400).json({
         success: false,
         message: "No image data provided",
+        debug: {
+          receivedKeys: Object.keys(body),
+        },
       });
     }
 
@@ -42,10 +81,18 @@ const uploadImage = async (req, res) => {
 
       if (deleteError) {
         console.error("Error deleting old image:", deleteError);
-        // Continue with upload even if delete fails
       } else {
         console.log("Old image deleted successfully");
       }
+    }
+
+    // Validate base64 format
+    if (!image.startsWith("data:image/")) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid image format. Must be base64 data URL (data:image/...)",
+      });
     }
 
     // Parse base64 image
@@ -57,13 +104,14 @@ const uploadImage = async (req, res) => {
     const mimeType = mimeMatch ? mimeMatch[1] : "png";
     const fileExt = mimeType === "jpeg" ? "jpg" : mimeType;
 
-    // Generate unique filename using timestamp (seperti HeroController)
+    // Generate unique filename using timestamp
     const fileName = `product-${Date.now()}.${fileExt}`;
     const filePath = `products/${fileName}`;
 
     console.log("Uploading to Supabase Storage:", filePath);
+    console.log("File size:", buffer.length, "bytes");
 
-    // Upload to Supabase Storage using admin client (bypass RLS)
+    // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
       .from("product-images")
       .upload(filePath, buffer, {
@@ -91,7 +139,7 @@ const uploadImage = async (req, res) => {
     console.log("Public URL:", publicUrlData.publicUrl);
     console.log("=== UPLOAD IMAGE END ===");
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Image uploaded successfully",
       data: {
@@ -103,81 +151,12 @@ const uploadImage = async (req, res) => {
   } catch (error) {
     console.error("=== UPLOAD IMAGE ERROR ===");
     console.error("Error details:", error);
-    console.error("Error stack:", error.stack);
+    console.error("Stack:", error.stack);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
       error: error.message,
     });
   }
-};
-
-/**
- * Delete image from Supabase Storage
- */
-const deleteImage = async (req, res) => {
-  try {
-    // Parse body jika belum di-parse (untuk Vercel)
-    let body = req.body;
-
-    if (typeof body === "string") {
-      body = JSON.parse(body);
-    }
-
-    if (!body && req.method === "POST") {
-      return res.status(400).json({
-        success: false,
-        message: "Request body is empty",
-      });
-    }
-
-    const { filePath } = body || {};
-
-    if (!filePath) {
-      return res.status(400).json({
-        success: false,
-        message: "File path is required",
-      });
-    }
-
-    console.log("=== DELETE IMAGE START ===");
-    console.log("Deleting file:", filePath);
-
-    const { data, error } = await supabaseAdmin.storage
-      .from("product-images")
-      .remove([filePath]);
-
-    if (error) {
-      console.error("Supabase delete error:", error);
-      return res.status(400).json({
-        success: false,
-        message: "Error deleting image",
-        error: error.message,
-      });
-    }
-
-    console.log("Delete successful:", data);
-    console.log("=== DELETE IMAGE END ===");
-
-    res.status(200).json({
-      success: true,
-      message: "Image deleted successfully",
-      data: data,
-    });
-  } catch (error) {
-    console.error("=== DELETE IMAGE ERROR ===");
-    console.error("Error details:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
-
-module.exports = {
-  uploadImage,
-  deleteImage,
 };
