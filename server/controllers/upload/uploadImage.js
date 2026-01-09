@@ -6,28 +6,41 @@ const { supabaseAdmin } = require("../../config/supabase");
  */
 const uploadImage = async (req, res) => {
   try {
-    // Parse body jika belum di-parse (untuk Vercel)
+    console.log("=== DEBUG INFO ===");
+    console.log("Method:", req.method);
+    console.log("Body type:", typeof req.body);
+    console.log("Body keys:", req.body ? Object.keys(req.body) : "no body");
+
+    // Parse body jika masih string (untuk compatibility Vercel)
     let body = req.body;
 
-    // Jika body masih string, parse dulu
     if (typeof body === "string") {
-      body = JSON.parse(body);
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.error("JSON parse error:", e);
+      }
     }
 
-    // Jika body masih undefined, coba baca dari req
-    if (!body && req.method === "POST") {
+    // Validasi body
+    if (!body || typeof body !== "object") {
       return res.status(400).json({
         success: false,
         message: "Request body is empty or invalid",
+        debug: {
+          bodyType: typeof req.body,
+          contentType: req.headers["content-type"],
+        },
       });
     }
 
-    const { image, oldImagePath } = body || {};
+    const { image, oldImagePath } = body;
 
     if (!image) {
       return res.status(400).json({
         success: false,
         message: "No image data provided",
+        receivedKeys: Object.keys(body),
       });
     }
 
@@ -48,6 +61,15 @@ const uploadImage = async (req, res) => {
       }
     }
 
+    // Validate base64 format
+    if (!image.startsWith("data:image/")) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid image format. Must be base64 data URL (data:image/...)",
+      });
+    }
+
     // Parse base64 image
     const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, "base64");
@@ -62,6 +84,7 @@ const uploadImage = async (req, res) => {
     const filePath = `products/${fileName}`;
 
     console.log("Uploading to Supabase Storage:", filePath);
+    console.log("File size:", buffer.length, "bytes");
 
     // Upload to Supabase Storage using admin client (bypass RLS)
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
@@ -118,21 +141,29 @@ const uploadImage = async (req, res) => {
  */
 const deleteImage = async (req, res) => {
   try {
-    // Parse body jika belum di-parse (untuk Vercel)
+    console.log("=== DELETE DEBUG ===");
+    console.log("Body type:", typeof req.body);
+    console.log("Body:", req.body);
+
+    // Parse body jika masih string
     let body = req.body;
 
     if (typeof body === "string") {
-      body = JSON.parse(body);
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.error("JSON parse error:", e);
+      }
     }
 
-    if (!body && req.method === "POST") {
+    if (!body || typeof body !== "object") {
       return res.status(400).json({
         success: false,
         message: "Request body is empty",
       });
     }
 
-    const { filePath } = body || {};
+    const { filePath } = body;
 
     if (!filePath) {
       return res.status(400).json({

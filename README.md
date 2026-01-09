@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Online Store CMS
 
-## Getting Started
+CMS toko online sederhana yang dikembangkan dari project UAS dan dikembangkan ulang dengan pendekatan yang lebih terstruktur. Project ini berfokus pada pemisahan antara **frontstore (customer-facing)** dan **admin CMS**, serta menggunakan arsitektur modern berbasis API.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Deskripsi Singkat
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Online Store CMS ini memungkinkan pemilik usaha untuk:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Mengelola katalog produk melalui admin panel
+- Mengatur konten utama landing page (hero & produk unggulan)
+- Menampilkan katalog produk ke customer
+- Mengarahkan transaksi langsung ke marketplace eksternal (Shopee)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Project ini **tidak menangani pembayaran internal**, melainkan berfungsi sebagai **etalase digital** dan penghubung ke platform penjualan.
 
-## Learn More
+**Live Demo (Frontstore):**
+[https://meta-jaya-shop.vercel.app/home](https://meta-jaya-shop.vercel.app/home)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Frontend
 
-## Deploy on Vercel
+- **Next.js** – React framework untuk routing, SSR/SSG, dan performa
+- **Tailwind CSS** – Utility-first CSS framework untuk styling
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Backend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Express.js** – REST API untuk mengelola data dan logic CMS
+
+### Infrastructure
+
+- **Supabase**
+
+  - Database (PostgreSQL)
+  - Storage (gambar produk & hero)
+
+---
+
+## Fitur Utama
+
+### 1. Frontstore
+
+Website yang dapat diakses oleh customer.
+
+#### 1.1 Beranda
+
+- Hero section
+
+  - Headline
+  - Background image (diatur dari admin)
+
+- Unique Selling Proposition (USP)
+- Produk unggulan (maksimal 3 produk)
+- Use case penggunaan produk
+- Review pelanggan
+- Call-to-action menuju katalog produk
+
+#### 1.2 Katalog Produk
+
+- Daftar seluruh produk
+- Fitur pencarian (search)
+- Filter produk
+
+#### 1.3 Detail Produk
+
+- Gambar produk
+- Nama produk
+- Harga
+- Deskripsi
+- Tombol **Belanja** (redirect ke link Shopee yang diatur di admin)
+- Fitur favorit
+
+#### 1.4 Tentang Toko
+
+- Deskripsi toko
+- Visi & misi
+- Link toko marketplace
+- Lokasi toko (maps)
+
+---
+
+### 2. Admin Panel
+
+Digunakan oleh pemilik toko untuk mengelola konten.
+
+#### 2.1 Manajemen Katalog
+
+- Create produk
+- Read produk
+- Update produk
+- Delete produk
+
+Setiap produk memiliki:
+
+- Nama
+- Harga
+- Deskripsi
+- Gambar
+- Link Shopee
+
+#### 2.2 Edit Hero Section
+
+- Mengubah headline hero
+- Mengganti background image hero
+
+#### 2.3 Produk Unggulan
+
+- Memilih maksimal **3 produk** dari katalog
+- Produk terpilih otomatis ditampilkan di beranda frontstore
+
+---
+
+## Karakteristik Sistem
+
+- Arsitektur **API-driven** (frontend dan backend terpisah)
+- Admin CMS terpisah dari tampilan customer
+- Tidak bergantung pada sistem checkout internal
+- Konten landing page dapat diubah tanpa deploy ulang frontend
+
+---
+
+## Tujuan Project
+
+Project ini dibuat sebagai:
+
+- Media pembelajaran pengembangan aplikasi web fullstack
+- Contoh implementasi CMS sederhana untuk toko online
+- Dasar website etalase digital untuk usaha kecil
+
+---
+
+## Catatan
+
+Project ini berfokus pada:
+
+- Struktur aplikasi
+- Pemisahan concern frontend & backend
+- Pengelolaan konten melalui CMS
+
+Bukan ditujukan sebagai marketplace penuh, melainkan **online storefront + CMS**.
