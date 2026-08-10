@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-// const dotenv = require("dotenv");
+const dotenv = require("dotenv");
 // const { getHero } = require("../controllers/HeroController");
 
 // Load environment variables
-// dotenv.config();
+dotenv.config();
 
 const app = express();
 

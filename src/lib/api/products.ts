@@ -38,7 +38,7 @@ export class ProductsAPI {
    * Get all products
    */
   static async getAll(): Promise<ApiResponse<Product[]>> {
-    const response = await fetch(getApiUrl("/api/products"));
+    const response = await fetch(getApiUrl("/api/products", true));
     return response.json();
   }
 
@@ -46,7 +46,7 @@ export class ProductsAPI {
    * Get single product by ID
    */
   static async getById(id: string): Promise<ApiResponse<Product>> {
-    const response = await fetch(getApiUrl(`/products/${id}`));
+    const response = await fetch(getApiUrl(`/api/products/${id}`, true));
     return response.json();
   }
 
@@ -54,7 +54,7 @@ export class ProductsAPI {
    * Create new product
    */
   static async create(data: ProductCreateData): Promise<ApiResponse<Product>> {
-    const response = await fetch(getApiUrl("/products"), {
+    const response = await fetch(getApiUrl("/api/products", true), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export class ProductsAPI {
     id: string,
     data: Partial<ProductCreateData>
   ): Promise<ApiResponse<Product>> {
-    const response = await fetch(getApiUrl(`/products/${id}`), {
+    const response = await fetch(getApiUrl(`/api/products/${id}`, true), {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export class ProductsAPI {
    * Delete product by ID
    */
   static async delete(id: string): Promise<ApiResponse<Product>> {
-    const response = await fetch(getApiUrl(`/products/${id}`), {
+    const response = await fetch(getApiUrl(`/api/products/${id}`, true), {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
